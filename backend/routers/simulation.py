@@ -22,12 +22,15 @@ async def simulate_impact(params: ImpactParameters):
         energy_joules, energy_mt = ImpactSimulator.calculate_impact_energy(
             params.size,
             params.density,
-            params.velocity
+            params.velocity,
+            getattr(params, 'angle', 45)  # Use angle if provided, default to 45°
         )
         
-        # Calculate crater size
+        # Calculate crater size using proper physics
         crater_diameter, crater_depth = ImpactSimulator.calculate_crater_size(
-            energy_mt,
+            params.size,
+            params.density,
+            params.velocity,
             params.is_water_impact
         )
         
@@ -85,13 +88,13 @@ async def simulate_impact(params: ImpactParameters):
         raise HTTPException(status_code=500, detail=f"Simulation error: {str(e)}")
 
 @router.get("/energy-estimate")
-async def estimate_energy(size: float, density: float, velocity: float):
+async def estimate_energy(size: float, density: float, velocity: float, angle: float = 45):
     """
     Quick energy estimation without full simulation.
     """
     try:
         energy_joules, energy_mt = ImpactSimulator.calculate_impact_energy(
-            size, density, velocity
+            size, density, velocity, angle
         )
         return {
             "joules": energy_joules,

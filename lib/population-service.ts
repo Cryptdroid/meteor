@@ -1,7 +1,5 @@
 /**
- * Population Density Service
- * Provides population density estimates for impact casualty calculations
- * Uses OpenStreetMap Nominatim API and built-in population density data
+ * Population Density Service - Updated with 2025 data
  */
 
 import { cachedFetch, apiCache } from './cache-service';
@@ -14,8 +12,7 @@ export interface PopulationData {
 }
 
 /**
- * Population density data for major regions
- * Data based on WorldPop and UN Population data (2024)
+ * Population density data for major regions - Updated 2025 from worldpopulationreview.com and visualcapitalist
  */
 const POPULATION_DENSITY_MAP = {
   // Major metropolitan areas (people per km²)
@@ -45,21 +42,24 @@ const POPULATION_DENSITY_MAP = {
     { name: 'London', lat: 51.5074, lng: -0.1278, density: 5701, population: 9500000 },
     { name: 'Chicago', lat: 41.8781, lng: -87.6298, density: 4447, population: 8900000 },
     { name: 'Bangalore', lat: 12.9716, lng: 77.5946, density: 11000, population: 8400000 },
-    { name: 'Hong Kong', lat: 22.3193, lng: 114.1694, density: 6777, population: 7500000 },
-    { name: 'Singapore', lat: 1.3521, lng: 103.8198, density: 8358, population: 5700000 },
+    { name: 'Hong Kong', lat: 22.3193, lng: 114.1694, density: 7044, population: 7500000 }, // Updated
+    { name: 'Singapore', lat: 1.3521, lng: 103.8198, density: 8177, population: 5700000 }, // Updated
     { name: 'Sydney', lat: -33.8688, lng: 151.2093, density: 2058, population: 5300000 },
     { name: 'San Francisco', lat: 37.7749, lng: -122.4194, density: 6658, population: 4700000 },
     { name: 'Toronto', lat: 43.6532, lng: -79.3832, density: 4334, population: 6200000 },
   ],
   
-  // Regional average densities by country
+  // Regional average densities by country - Updated 2025
   countries: [
-    { name: 'Monaco', density: 26150 },
-    { name: 'Singapore', density: 8358 },
-    { name: 'Hong Kong', density: 6777 },
+    { name: 'Macau', density: 21946 },
+    { name: 'Monaco', density: 19171 },
+    { name: 'Singapore', density: 8177 },
+    { name: 'Hong Kong', density: 7044 },
+    { name: 'Gibraltar', density: 5901 },
     { name: 'Bangladesh', density: 1265 },
     { name: 'Lebanon', density: 669 },
-    { name: 'Taiwan', density: 673 },
+    { name: 'Taiwan', density: 652 },
+    { name: 'Rwanda', density: 601 },
     { name: 'South Korea', density: 527 },
     { name: 'Netherlands', density: 508 },
     { name: 'Belgium', density: 383 },
@@ -82,6 +82,8 @@ const POPULATION_DENSITY_MAP = {
     { name: 'Canada', density: 4 },
   ],
 };
+
+// ... (rest of the class unchanged, as logic is fine; only data updated)
 
 export class PopulationService {
   private static readonly EARTH_RADIUS = 6371; // km
