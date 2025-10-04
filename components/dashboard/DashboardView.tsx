@@ -3,8 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '@/store/useAppStore';
 import { useDynamicNASAData } from '@/lib/hooks/useDynamicNASAData';
-import DashboardMain from './DashboardMain';
-import OrbitalView from './OrbitalView';
+import UnifiedSimulationView from './UnifiedSimulationView';
 import DefendEarthMode from './DefendEarthMode';
 import { RefreshCw, AlertCircle } from 'lucide-react';
 
@@ -19,34 +18,34 @@ export default function DashboardView() {
   const { isLoading, error, lastUpdated, refetch } = useDynamicNASAData();
 
   return (
-    <div className="pt-24 pb-8 min-h-screen bg-gradient-to-b from-space-dark via-space-blue/20 to-space-dark">
-      {/* Data Status Bar */}
-      <div className="container mx-auto px-4 mb-4">
+    <div className="pt-24 pb-8 min-h-screen bg-stellar-void">
+      {/* Status Bar */}
+      <div className="container mx-auto px-4 lg:px-6 mb-6">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-morphism border border-white/10 rounded-xl p-3 flex items-center justify-between"
+          className="glass-panel border border-stellar-surface/30 rounded-2xl p-4 flex items-center justify-between"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {isLoading ? (
               <>
-                <RefreshCw className="w-4 h-4 text-space-cyan animate-spin" />
-                <span className="text-sm text-gray-300">Loading NASA data...</span>
+                <RefreshCw className="w-5 h-5 text-cyber-500 animate-spin" />
+                <span className="text-stellar-light font-mono">Synchronizing NASA feed...</span>
               </>
             ) : error ? (
               <>
-                <AlertCircle className="w-4 h-4 text-red-500" />
-                <span className="text-sm text-red-400">{error}</span>
+                <AlertCircle className="w-5 h-5 text-status-critical animate-pulse" />
+                <span className="text-status-critical font-medium">{error}</span>
               </>
             ) : (
               <>
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-sm text-gray-300">
-                  Live data • Last updated:{' '}
-                  {lastUpdated
-                    ? new Date(lastUpdated).toLocaleTimeString()
-                    : 'Never'}
-                </span>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-status-normal animate-pulse shadow-lg shadow-status-normal/50" />
+                  <span className="text-status-normal font-medium">SYSTEM ACTIVE</span>
+                </div>
+                <div className="text-stellar-light/70 font-mono text-sm">
+                  Last sync: {lastUpdated ? new Date(lastUpdated).toLocaleTimeString() : 'Initializing...'}
+                </div>
               </>
             )}
           </div>
@@ -56,15 +55,15 @@ export default function DashboardView() {
             whileTap={{ scale: 0.95 }}
             onClick={refetch}
             disabled={isLoading}
-            className="px-3 py-1 bg-space-cyan/20 border border-space-cyan/50 rounded-lg text-space-cyan text-sm hover:bg-space-cyan/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="glass-card px-4 py-2 border border-cyber-500/30 rounded-xl text-cyber-400 hover:border-cyber-500 hover:cyber-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
           >
-            <RefreshCw className={`w-3 h-3 ${isLoading ? 'animate-spin' : ''}`} />
-            Refresh
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Refresh Data</span>
           </motion.button>
         </motion.div>
       </div>
 
-      {/* View Content with Animations */}
+      {/* Main Content */}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeView}
@@ -72,10 +71,9 @@ export default function DashboardView() {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+          transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
         >
-          {activeView === 'dashboard' && <DashboardMain />}
-          {activeView === 'orbital' && <OrbitalView />}
+          {activeView === 'simulation' && <UnifiedSimulationView />}
           {activeView === 'defend-earth' && <DefendEarthMode />}
         </motion.div>
       </AnimatePresence>

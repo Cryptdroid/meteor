@@ -210,85 +210,78 @@ function SimpleStars() {
   );
 }
 
-export default function OrbitalView() {
+export default function OrbitalView({ embedded = false }: { embedded?: boolean }) {
   const { selectedAsteroid, selectedDeflectionStrategy } = useAppStore();
 
-  return (
-    <div className="container mx-auto px-4">
-      <Card className="h-[calc(100vh-8rem)]">
-        <CardHeader>
-          <CardTitle className="text-space-cyan">Orbital Mechanics Viewer</CardTitle>
-          {selectedAsteroid && (
-            <p className="text-sm text-gray-400">
-              Viewing: {selectedAsteroid.name}
-            </p>
-          )}
-          <p className="text-xs text-gray-500 mt-1">
-            ⚡ Optimized for performance - Drag to rotate, scroll to zoom
-          </p>
-        </CardHeader>
-        <CardContent className="h-[calc(100%-5rem)]">
-          <Canvas 
-            className="w-full h-full bg-black rounded-lg"
-            gl={{ 
-              antialias: false, // Disable antialiasing for better performance
-              powerPreference: "high-performance"
-            }}
-            dpr={1} // Fixed pixel ratio for consistent performance
-          >
-            <PerspectiveCamera makeDefault position={[0, 50, 150]} fov={60} />
-            <OrbitControls 
-              enableZoom 
-              enablePan 
-              enableRotate 
-              enableDamping
-              dampingFactor={0.05}
-              maxDistance={400}
-              minDistance={50}
+  const canvasContent = (
+    <Canvas 
+      className="w-full h-full bg-stellar-void rounded-xl border border-stellar-surface/20"
+      gl={{ 
+        antialias: false,
+        powerPreference: "high-performance"
+      }}
+      dpr={1}
+    >
+      <PerspectiveCamera makeDefault position={[0, 50, 150]} fov={60} />
+      <OrbitControls 
+        enableZoom 
+        enablePan 
+        enableRotate 
+        enableDamping
+        dampingFactor={0.05}
+        maxDistance={400}
+        minDistance={50}
+      />
+
+      {/* Enhanced Lighting */}
+      <ambientLight intensity={0.3} />
+      <pointLight position={[0, 0, 0]} intensity={2} color="#FDB813" decay={2} />
+      <pointLight position={[100, 50, 50]} intensity={0.5} color="#00D4FF" decay={2} />
+
+      <Suspense fallback={null}>
+        {/* Starfield */}
+        <SimpleStars />
+
+        {/* Sun with enhanced glow */}
+        <mesh position={[0, 0, 0]}>
+          <sphereGeometry args={[5, 16, 16]} />
+          <meshBasicMaterial color="#FDB813" />
+        </mesh>
+
+        <mesh position={[0, 0, 0]}>
+          <sphereGeometry args={[8, 16, 16]} />
+          <meshBasicMaterial
+            color="#FDB813"
+            transparent
+            opacity={0.2}
+            blending={THREE.AdditiveBlending}
+          />
+        </mesh>
+
+        {/* Earth */}
+        <SimpleEarth position={[100, 0, 0]} />
+
+        {/* Asteroid and Orbit */}
+        {selectedAsteroid && (
+          <>
+            <SimpleAsteroid position={[80, 10, 20]} size={2} />
+            <SimpleOrbitPath
+              orbitalData={selectedAsteroid.orbital_data}
+              deflectionApplied={!!selectedDeflectionStrategy}
             />
+          </>
+        )}
+      </Suspense>
+    </Canvas>
+  );
 
-            {/* Lighting - Simplified */}
-            <ambientLight intensity={0.4} />
-            <pointLight position={[0, 0, 0]} intensity={2} color="#FDB813" decay={2} />
+  if (embedded) {
+    return canvasContent;
+  }
 
-            <Suspense fallback={null}>
-              {/* Starfield */}
-              <SimpleStars />
-
-              {/* Sun - Simple emissive sphere */}
-              <mesh position={[0, 0, 0]}>
-                <sphereGeometry args={[5, 16, 16]} />
-                <meshBasicMaterial color="#FDB813" />
-              </mesh>
-
-              {/* Sun glow */}
-              <mesh position={[0, 0, 0]}>
-                <sphereGeometry args={[7, 16, 16]} />
-                <meshBasicMaterial
-                  color="#FDB813"
-                  transparent
-                  opacity={0.3}
-                  blending={THREE.AdditiveBlending}
-                />
-              </mesh>
-
-              {/* Earth - Optimized */}
-              <SimpleEarth position={[100, 0, 0]} />
-
-              {/* Asteroid and Orbit */}
-              {selectedAsteroid && (
-                <>
-                  <SimpleAsteroid position={[80, 10, 20]} size={2} />
-                  <SimpleOrbitPath
-                    orbitalData={selectedAsteroid.orbital_data}
-                    deflectionApplied={!!selectedDeflectionStrategy}
-                  />
-                </>
-              )}
-            </Suspense>
-          </Canvas>
-        </CardContent>
-      </Card>
+  return (
+    <div className="w-full h-full">
+      {canvasContent}
     </div>
   );
 }

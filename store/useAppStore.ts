@@ -31,7 +31,7 @@ export const useAppStore = create<AppStore>((set) => ({
   // Initial state
   selectedAsteroid: null,
   simulationResults: null,
-  activeView: 'dashboard',
+  activeView: 'simulation',
   isSimulating: false,
   showEnvironmentalOverlays: {
     seismic: true,

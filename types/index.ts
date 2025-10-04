@@ -147,7 +147,7 @@ export interface Vector3D {
 export interface DashboardState {
   selectedAsteroid: NASAAsteroid | null;
   simulationResults: ImpactResults | null;
-  activeView: 'dashboard' | 'orbital' | 'impact-map' | 'defend-earth';
+  activeView: 'simulation' | 'defend-earth';
   isSimulating: boolean;
   showEnvironmentalOverlays: {
     seismic: boolean;

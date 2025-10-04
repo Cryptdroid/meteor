@@ -16,6 +16,7 @@ A comprehensive web-based platform for simulating asteroid impacts, visualizing 
 - **Population Density Analysis**: Casualty calculations using real population data
 - **3D Orbital Visualization**: Interactive Three.js/React Three Fiber visualization of asteroid orbits
 - **2D Impact Mapping**: Leaflet-based Earth surface maps with impact zone overlays
+- **Augmented Reality Mode**: View asteroids in real-world space using WebXR AR on mobile devices
 - **Deflection Strategies**: Simulate kinetic impactor, gravity tractor, and laser ablation missions
 - **Defend Earth Game Mode**: Interactive scenario-based planetary defense challenge
 
@@ -27,7 +28,8 @@ A comprehensive web-based platform for simulating asteroid impacts, visualizing 
 
 ### Technical Highlights
 - **Frontend**: Next.js 14 (App Router), TypeScript, TailwindCSS, Framer Motion, GSAP
-- **3D Graphics**: Three.js, @react-three/fiber, @react-three/drei
+- **3D Graphics**: Three.js, @react-three/fiber, @react-three/drei, @react-three/xr
+- **WebXR**: Augmented Reality support for mobile devices (iOS ARKit, Android ARCore)
 - **Backend**: Python FastAPI with scientific calculations
 - **API Caching**: Intelligent caching layer for USGS and Nominatim APIs
 - **State Management**: Zustand
@@ -91,12 +93,25 @@ asteroid-impact-simulator/
 ├── app/                        # Next.js app directory
 │   ├── globals.css            # Global styles
 │   ├── layout.tsx             # Root layout
-│   └── page.tsx               # Home page
+│   ├── page.tsx               # Home page
+│   ├── dashboard/             # Dashboard page
+│   └── ar/                    # AR Mode page
+│       └── page.tsx
 ├── components/
 │   ├── 3d/                    # Three.js 3D components
 │   │   ├── AsteroidModel.tsx
 │   │   ├── EarthModel.tsx
 │   │   └── OrbitPath.tsx
+│   ├── ar/                    # Augmented Reality components
+│   │   ├── ARScene.tsx
+│   │   ├── ARContent.tsx
+│   │   ├── ARAsteroidModel.tsx
+│   │   ├── AREarthModel.tsx
+│   │   ├── AROrbitPath.tsx
+│   │   ├── ARImpactZone.tsx
+│   │   ├── ARControls.tsx
+│   │   ├── ARHitTest.tsx
+│   │   └── ARDistanceMeasurement.tsx
 │   ├── dashboard/             # Main dashboard components
 │   │   ├── AsteroidList.tsx
 │   │   ├── ControlPanel.tsx
@@ -125,7 +140,8 @@ asteroid-impact-simulator/
 │   └── utils.ts              # Helper functions
 ├── store/                     # State management
 │   ├── useAppStore.ts        # Main application state
-│   └── useGameStore.ts       # Game mode state
+│   ├── useGameStore.ts       # Game mode state
+│   └── useARStore.ts         # AR mode state
 ├── types/                     # TypeScript definitions
 │   └── index.ts
 ├── backend/                   # Python FastAPI backend
@@ -137,6 +153,8 @@ asteroid-impact-simulator/
 │   │   ├── deflection.py    # Deflection calculations
 │   │   └── simulation.py    # Simulation endpoints
 │   └── requirements.txt      # Python dependencies
+├── AR_USER_GUIDE.md          # AR mode user documentation
+├── AR_TECHNICAL_DOCS.md      # AR implementation docs
 └── README.md
 
 ## 🎮 Usage Guide
@@ -183,6 +201,30 @@ asteroid-impact-simulator/
    - **Laser Ablation**: Experimental, variable effectiveness
 4. Deploy before time runs out!
 5. View your score based on timing and success
+
+### Augmented Reality Mode
+1. Access AR mode by clicking **"AR Mode"** in the navigation bar
+2. Allow camera permissions when prompted
+3. Click **"Enter AR"** to start the AR session
+4. Point camera at a flat surface (table, floor)
+5. Tap to place the asteroid scene in real space
+6. Interact with asteroids:
+   - **Tap**: Select asteroid to see details
+   - **Pinch**: Scale the entire scene
+   - **Two fingers**: Rotate view
+7. Toggle settings with the ⚙️ icon:
+   - Scale adjustment
+   - Grid/labels/orbits visibility
+   - Impact simulation
+8. View real-time NASA data in AR space
+
+**AR Requirements:**
+- Mobile device with ARKit (iOS 15+) or ARCore (Android 8+)
+- Modern mobile browser (Safari on iOS, Chrome on Android)
+- Camera permissions enabled
+- Good lighting conditions
+
+For detailed AR instructions, see [AR_USER_GUIDE.md](AR_USER_GUIDE.md)
 
 ## 🔬 Scientific Background
 
@@ -267,12 +309,14 @@ impactParameters: {
 
 - [ ] PostgreSQL database integration
 - [ ] Machine learning impact prediction
-- [ ] WebXR/AR mode for mobile devices
+- [x] **WebXR/AR mode for mobile devices** ✅ **COMPLETED**
 - [ ] PDF report generation
-- [ ] Social media sharing
+- [ ] Social media sharing from AR sessions
 - [ ] Multi-language support
 - [ ] Real-time multiplayer Defend Earth mode
-- [ ] Integration with USGS geological data
+- [ ] Persistent AR anchors (cloud anchors)
+- [ ] AR recording and screenshot functionality
+- [ ] Multi-user AR sessions
 - [ ] Historical impact database
 
 ## 🤝 Contributing

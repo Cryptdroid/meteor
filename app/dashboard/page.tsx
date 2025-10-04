@@ -10,7 +10,7 @@ const DashboardView = dynamic(() => import('@/components/dashboard/DashboardView
 
 export default function DashboardPage() {
   return (
-    <main className="min-h-screen relative overflow-hidden bg-space-dark">
+    <main className="min-h-screen relative overflow-hidden bg-stellar-void">
       <Header />
       <Suspense fallback={<LoadingScreen />}>
         <DashboardView />
