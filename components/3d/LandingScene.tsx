@@ -213,12 +213,3 @@ export default function LandingScene() {
   );
 }
 
-/* Solar System Scene - Commented Out
-export default function LandingScene() {
-  return (
-    <div className="absolute inset-0 w-full h-full">
-      <SolarSystemScene />
-    </div>
-  );
-}
-*/

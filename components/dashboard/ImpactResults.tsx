@@ -6,6 +6,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { AlertTriangle, Calculator, Target } from 'lucide-react';
 import { ImpactStatistics } from './ImpactStatistics';
 import LoadingScreen from '@/components/ui/LoadingScreen';
+import { QuickShareButton } from '@/components/ui/SocialSharing';
+import InfoTooltip from '@/components/ui/InfoTooltip';
 
 export default function ImpactResults() {
   const { simulationResults, selectedAsteroid, isSimulating, impactParameters } = useAppStore();
@@ -127,15 +129,25 @@ export default function ImpactResults() {
   return (
     <div className="space-y-4">
       {/* Compact Impact Summary */}
-      <Card variant="glass" className="p-4">
-        <div className="flex items-center gap-3 mb-3">
-          <AlertTriangle className={`w-5 h-5 ${
-            getThreatLevel() === 'extreme' ? 'text-status-critical' :
-            getThreatLevel() === 'high' ? 'text-status-warning' :
-            getThreatLevel() === 'moderate' ? 'text-status-caution' :
-            'text-cyber-400'
-          }`} />
-          <h3 className="text-lg font-semibold text-white">Impact Analysis Results</h3>
+      <Card variant="glass" className="p-4" id="impact-results">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className={`w-5 h-5 ${
+              getThreatLevel() === 'extreme' ? 'text-status-critical' :
+              getThreatLevel() === 'high' ? 'text-status-warning' :
+              getThreatLevel() === 'moderate' ? 'text-status-caution' :
+              'text-cyber-400'
+            }`} />
+            <h3 className="text-lg font-semibold text-white">Impact Analysis Results</h3>
+          </div>
+          <QuickShareButton
+            type="impact"
+            data={{
+              simulationResults,
+              asteroidName: selectedAsteroid?.name || 'Unknown Asteroid'
+            }}
+            elementId="impact-results"
+          />
           <div className={`px-3 py-1 rounded-full text-xs font-bold ${
             getThreatLevel() === 'extreme' ? 'bg-status-critical/20 text-status-critical' :
             getThreatLevel() === 'high' ? 'bg-status-warning/20 text-status-warning' :
@@ -153,7 +165,10 @@ export default function ImpactResults() {
               {energy.megatonsTNT.toFixed(1)}
             </div>
             <div className="text-sm text-stellar-light/80 font-medium">MT TNT</div>
-            <div className="text-xs text-stellar-light/60 mt-1">Kinetic Energy</div>
+            <div className="text-xs text-stellar-light/60 mt-1 flex items-center justify-center">
+              Kinetic Energy
+              <InfoTooltip termKey="impact_energy" size="sm" />
+            </div>
           </div>
           
           <div className="text-center p-4 rounded bg-stellar-surface/20 border border-matrix-500/20">
@@ -161,7 +176,10 @@ export default function ImpactResults() {
               {(crater.diameter / 1000).toFixed(1)}
             </div>
             <div className="text-sm text-stellar-light/80 font-medium">km diameter</div>
-            <div className="text-xs text-stellar-light/60 mt-1">Crater Size</div>
+            <div className="text-xs text-stellar-light/60 mt-1 flex items-center justify-center">
+              Crater Size
+              <InfoTooltip termKey="crater_diameter" size="sm" />
+            </div>
           </div>
           
           <div className="text-center p-4 rounded bg-stellar-surface/20 border border-status-warning/20">
@@ -169,7 +187,10 @@ export default function ImpactResults() {
               {seismic.magnitude.toFixed(1)}
             </div>
             <div className="text-sm text-stellar-light/80 font-medium">magnitude</div>
-            <div className="text-xs text-stellar-light/60 mt-1">Seismic Impact</div>
+            <div className="text-xs text-stellar-light/60 mt-1 flex items-center justify-center">
+              Seismic Impact
+              <InfoTooltip termKey="seismic_magnitude" size="sm" />
+            </div>
           </div>
           
           <div className="text-center p-4 rounded bg-stellar-surface/20 border border-status-critical/20">
@@ -187,14 +208,20 @@ export default function ImpactResults() {
             <div className="text-cyber-400 text-xl font-bold font-mono mb-1">
               {atmospheric.thermalRadiation.toFixed(0)} km
             </div>
-            <div className="text-sm text-stellar-light/80">Thermal Radius</div>
+            <div className="text-sm text-stellar-light/80 flex items-center justify-center">
+              Thermal Radius
+              <InfoTooltip termKey="thermal_radiation" size="sm" />
+            </div>
           </div>
           
           <div className="text-center p-3 rounded bg-stellar-deep/30">
             <div className="text-matrix-400 text-xl font-bold font-mono mb-1">
               {atmospheric.fireballRadius.toFixed(1)} km
             </div>
-            <div className="text-sm text-stellar-light/80">Fireball Radius</div>
+            <div className="text-sm text-stellar-light/80 flex items-center justify-center">
+              Fireball Radius
+              <InfoTooltip termKey="fireball_radius" size="sm" />
+            </div>
           </div>
         </div>
       </Card>

@@ -65,7 +65,7 @@ function MapClickHandler() {
 }
 
 export default function ImpactMap() {
-  const { simulationResults, impactParameters, showEnvironmentalOverlays, setImpactParameters } = useAppStore();
+  const { simulationResults, impactParameters, showEnvironmentalOverlays, setImpactParameters, selectedAsteroid } = useAppStore();
   const [selectedCity, setSelectedCity] = useState<string>('');
 
   // Get major cities from PopulationService
@@ -96,7 +96,7 @@ export default function ImpactMap() {
   };
 
   return (
-    <Card>
+    <Card id="impact-map">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-space-cyan flex items-center gap-2">
@@ -104,21 +104,24 @@ export default function ImpactMap() {
             Impact Zone Map
           </CardTitle>
           
-          {/* City Selector Dropdown */}
-          <div className="flex items-center gap-2">
-            <Target className="w-4 h-4 text-gray-400" />
-            <select
-              value={selectedCity}
-              onChange={(e) => handleCitySelect(e.target.value)}
-              className="px-3 py-1.5 text-sm bg-white/5 border border-white/10 rounded-md text-white hover:border-space-cyan/50 focus:outline-none focus:ring-2 focus:ring-space-cyan/50 transition-colors cursor-pointer"
-            >
-              <option value="" className="bg-space-dark text-white">Select a city...</option>
-              {majorCities.map((city) => (
-                <option key={city.name} value={city.name} className="bg-space-dark text-white">
-                  {city.name} ({(city.population / 1000000).toFixed(1)}M)
+          {/* Controls */}
+          <div className="flex items-center gap-3">            
+            {/* City Selector Dropdown */}
+            <div className="flex items-center gap-2">
+              <Target className="w-4 h-4 text-gray-400" />
+              <select
+                value={selectedCity}
+                onChange={(e) => handleCitySelect(e.target.value)}
+                className="px-3 py-1.5 text-sm bg-white/5 border border-white/10 rounded-md text-white hover:border-space-cyan/50 focus:outline-none focus:ring-2 focus:ring-space-cyan/50 transition-colors cursor-pointer"
+              >
+                <option value="" className="bg-space-dark text-white">Select a city...</option>
+                {majorCities.map((city) => (
+                  <option key={city.name} value={city.name} className="bg-space-dark text-white">
+                    {city.name} ({(city.population / 1000000).toFixed(1)}M)
                 </option>
               ))}
-            </select>
+              </select>
+            </div>
           </div>
         </div>
         <p className="text-xs text-gray-400 mt-2">

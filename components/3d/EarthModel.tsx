@@ -2,7 +2,7 @@
 
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Sphere } from '@react-three/drei';
+import { Sphere, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Vertex shader for atmosphere (from tutorial)
@@ -42,103 +42,61 @@ export default function EarthModel({ position = [0, 0, 0] }: EarthModelProps) {
   const earthRef = useRef<THREE.Mesh>(null);
   const cloudsRef = useRef<THREE.Mesh>(null);
   const atmosphereRef = useRef<THREE.Mesh>(null);
-  const materialRef = useRef<THREE.MeshStandardMaterial | null>(null);
-  const uvOffsetRef = useRef(0);
 
-  // Load real NASA textures from assets folder with optimization
-  const earthTexture = useMemo(() => {
-    const loader = new THREE.TextureLoader();
-    const texture = loader.load(
-      '/assets/Gaia_EDR3_darkened.png',
-      () => console.log('Earth texture loaded successfully'),
-      undefined,
-      (err) => console.error('Error loading earth texture:', err)
-    );
-    texture.colorSpace = THREE.SRGBColorSpace;
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.ClampToEdgeWrapping;
-    // Performance optimization
-    texture.minFilter = THREE.LinearMipmapLinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-    texture.generateMipmaps = true;
-    texture.anisotropy = 2; // Reduced from default 16
-    return texture;
-  }, []);
+  // Load all textures using useTexture for Suspense support and better loading handling
+  const textures = useTexture({
+    map: '/assets/Gaia_EDR3_darkened.png',
+    bumpMap: '/assets/Bump.jpg',
+    alphaMap: '/assets/Clouds.png',
+    roughnessMap: '/assets/Ocean.png',
+    emissiveMap: '/assets/night_lights_modified.png',
+  });
 
-  const bumpTexture = useMemo(() => {
-    const loader = new THREE.TextureLoader();
-    const texture = loader.load(
-      '/assets/Bump.jpg',
-      () => console.log('Bump texture loaded successfully'),
-      undefined,
-      (err) => console.error('Error loading bump texture:', err)
-    );
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.ClampToEdgeWrapping;
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-    texture.generateMipmaps = false; // Disable for bump maps
-    return texture;
-  }, []);
+  // Apply texture settings in useMemo to avoid re-applying on every render
+  useMemo(() => {
+    // Earth texture
+    const earthTex = textures.map;
+    earthTex.colorSpace = THREE.SRGBColorSpace;
+    earthTex.wrapS = THREE.RepeatWrapping;
+    earthTex.wrapT = THREE.ClampToEdgeWrapping;
+    earthTex.minFilter = THREE.LinearMipmapLinearFilter;
+    earthTex.magFilter = THREE.LinearFilter;
+    earthTex.generateMipmaps = true;
+    earthTex.anisotropy = 1;
 
-  const cloudTexture = useMemo(() => {
-    const loader = new THREE.TextureLoader();
-    const texture = loader.load(
-      '/assets/Clouds.png',
-      () => console.log('Cloud texture loaded successfully'),
-      undefined,
-      (err) => console.error('Error loading cloud texture:', err)
-    );
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.ClampToEdgeWrapping;
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-    return texture;
-  }, []);
+    // Bump texture
+    const bumpTex = textures.bumpMap;
+    bumpTex.wrapS = THREE.RepeatWrapping;
+    bumpTex.wrapT = THREE.ClampToEdgeWrapping;
+    bumpTex.minFilter = THREE.NearestFilter; // Changed to Nearest for faster filtering
+    bumpTex.magFilter = THREE.NearestFilter;
+    bumpTex.generateMipmaps = false;
 
-  const oceanTexture = useMemo(() => {
-    const loader = new THREE.TextureLoader();
-    const texture = loader.load(
-      '/assets/Ocean.png',
-      () => console.log('Ocean texture loaded successfully'),
-      undefined,
-      (err) => console.error('Error loading ocean texture:', err)
-    );
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.ClampToEdgeWrapping;
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-    return texture;
-  }, []);
+    // Cloud texture
+    const cloudTex = textures.alphaMap;
+    cloudTex.wrapS = THREE.RepeatWrapping;
+    cloudTex.wrapT = THREE.ClampToEdgeWrapping;
+    cloudTex.minFilter = THREE.NearestFilter; // Changed to Nearest
+    cloudTex.magFilter = THREE.NearestFilter;
 
-  const lightsTexture = useMemo(() => {
-    const loader = new THREE.TextureLoader();
-    const texture = loader.load(
-      '/assets/night_lights_modified.png',
-      () => console.log('Night lights texture loaded successfully'),
-      undefined,
-      (err) => console.error('Error loading night lights texture:', err)
-    );
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.ClampToEdgeWrapping;
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-    return texture;
-  }, []);
+    // Ocean texture
+    const oceanTex = textures.roughnessMap;
+    oceanTex.wrapS = THREE.RepeatWrapping;
+    oceanTex.wrapT = THREE.ClampToEdgeWrapping;
+    oceanTex.minFilter = THREE.NearestFilter; // Changed to Nearest
+    oceanTex.magFilter = THREE.NearestFilter;
+
+    // Lights texture
+    const lightsTex = textures.emissiveMap;
+    lightsTex.wrapS = THREE.RepeatWrapping;
+    lightsTex.wrapT = THREE.ClampToEdgeWrapping;
+    lightsTex.minFilter = THREE.NearestFilter; // Changed to Nearest
+    lightsTex.magFilter = THREE.NearestFilter;
+  }, [textures]);
 
   // Set initial rotation positions and animate
   useFrame((state, delta) => {
     const speedFactor = 1.0;
-    
-    // Set initial rotation once
-    if (earthRef.current && !earthRef.current.userData.initialized) {
-      earthRef.current.rotateY(-0.3);
-      earthRef.current.userData.initialized = true;
-    }
-    if (cloudsRef.current && !cloudsRef.current.userData.initialized) {
-      cloudsRef.current.rotateY(-0.3);
-      cloudsRef.current.userData.initialized = true;
-    }
     
     // Rotate Earth and clouds
     if (earthRef.current) {
@@ -149,35 +107,45 @@ export default function EarthModel({ position = [0, 0, 0] }: EarthModelProps) {
     }
   });
 
+  // Apply initial rotation outside of useFrame for one-time setup
+  useMemo(() => {
+    if (earthRef.current) {
+      earthRef.current.rotateY(-0.3);
+    }
+    if (cloudsRef.current) {
+      cloudsRef.current.rotateY(-0.3);
+    }
+  }, []); // Empty dependency array ensures it runs once
+
   return (
     <group position={position} rotation={[0, 0, 23.5 / 360 * 2 * Math.PI]}>
-      {/* Main Earth sphere with all maps - Reduced segments for performance */}
-      <Sphere ref={earthRef} args={[10, 48, 48]}>
+      {/* Main Earth sphere with all maps - Further reduced segments */}
+      <Sphere ref={earthRef} args={[10, 24, 24]}>
         <meshStandardMaterial
-          map={earthTexture}
-          bumpMap={bumpTexture}
+          map={textures.map}
+          bumpMap={textures.bumpMap}
           bumpScale={0.05}
-          roughnessMap={oceanTexture}
+          roughnessMap={textures.roughnessMap}
           roughness={1.0}
           metalness={0.0}
-          emissiveMap={lightsTexture}
+          emissiveMap={textures.emissiveMap}
           emissive={new THREE.Color(0xffff88)}
           emissiveIntensity={0.8}
         />
       </Sphere>
 
       {/* Clouds layer - Reduced segments */}
-      <Sphere ref={cloudsRef} args={[10.1, 48, 48]}>
+      <Sphere ref={cloudsRef} args={[10.1, 24, 24]}>
         <meshStandardMaterial
-          alphaMap={cloudTexture}
+          alphaMap={textures.alphaMap}
           transparent
           opacity={0.6}
           depthWrite={false}
         />
       </Sphere>
 
-      {/* Atmosphere using custom shader - Reduced segments */}
-      <Sphere ref={atmosphereRef} args={[12, 32, 32]}>
+      {/* Atmosphere using custom shader - Further reduced segments */}
+      <Sphere ref={atmosphereRef} args={[12, 12, 12]}>
         <shaderMaterial
           vertexShader={atmosphereVertexShader}
           fragmentShader={atmosphereFragmentShader}
@@ -189,12 +157,13 @@ export default function EarthModel({ position = [0, 0, 0] }: EarthModelProps) {
           side={THREE.BackSide}
           blending={THREE.AdditiveBlending}
           transparent
+          depthWrite={false}
         />
       </Sphere>
 
       {/* Orbit ring - Reduced segments */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[99, 101, 64]} />
+        <ringGeometry args={[99, 101, 16]} />
         <meshBasicMaterial
           color="#00ff9f"
           transparent
