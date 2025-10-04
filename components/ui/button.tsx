@@ -40,9 +40,9 @@ const buttonVariants = cva(
         danger:
           "bg-status-extreme text-white hover:bg-purple-600 border border-status-extreme/30 hover:border-purple-500 hover:shadow-lg hover:shadow-status-extreme/25 active:bg-purple-700 rounded-xl font-semibold tracking-wide",
         
-        // Neon-style button with intense glow
+        // Neon-style button with clean glow
         neon:
-          "bg-gradient-to-r from-cyber-500 to-matrix-500 text-stellar-void hover:from-cyber-400 hover:to-matrix-400 border border-cyber-500/50 hover:border-cyber-400 hover:shadow-xl hover:shadow-cyber-500/40 active:from-cyber-600 active:to-matrix-600 rounded-xl font-bold tracking-wide neon-text cyber-glow",
+          "bg-gradient-to-r from-cyber-500 to-matrix-500 text-stellar-void hover:from-cyber-400 hover:to-matrix-400 border border-cyber-500/30 hover:border-cyber-400/50 hover:shadow-lg hover:shadow-cyber-500/25 active:from-cyber-600 active:to-matrix-600 rounded-xl font-bold tracking-wide",
       },
       size: {
         sm: "h-8 px-3 text-xs rounded-lg",

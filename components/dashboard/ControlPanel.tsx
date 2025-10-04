@@ -167,34 +167,34 @@ export default function ControlPanel() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-space-cyan">Impact Parameters</CardTitle>
+    <Card variant="glass">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-cyber-400">Impact Parameters</CardTitle>
         {selectedAsteroid && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 mt-2 p-3 rounded-lg bg-space-cyan/10 border border-space-cyan/30"
+            className="flex items-center gap-2 mt-2 p-2 rounded-lg bg-cyber-500/10 border border-cyber-500/30"
           >
-            <AlertTriangle className="w-4 h-4 text-space-cyan" />
-            <p className="text-sm text-gray-300">
-              Parameters auto-loaded from <strong className="text-white">{selectedAsteroid.name}</strong>
+            <AlertTriangle className="w-4 h-4 text-cyber-400" />
+            <p className="text-xs text-stellar-light/80">
+              Auto-loaded: <strong className="text-white">{selectedAsteroid.name}</strong>
             </p>
           </motion.div>
         )}
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4">
         {/* Size Slider */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <label className="text-sm font-medium flex items-center">
+            <label className="text-xs font-medium flex items-center text-stellar-light/80">
               Asteroid Size (meters)
               <InfoTooltip 
                 termKey="crater_diameter"
                 size="sm"
               />
             </label>
-            <span className="text-sm text-space-cyan font-bold">{impactParameters.size.toLocaleString()}m</span>
+            <span className="text-sm text-cyber-400 font-bold">{impactParameters.size.toLocaleString()}m</span>
           </div>
           <Slider
             value={[impactParameters.size]}

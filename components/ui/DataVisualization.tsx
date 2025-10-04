@@ -52,25 +52,25 @@ const colorMap = {
 
 const sizeMap = {
   sm: {
-    container: 'w-24 h-24',
+    container: 'w-20 h-20',
+    stroke: 3,
+    radius: 32,
+    text: 'text-xs',
+    iconSize: 'w-3 h-3'
+  },
+  md: {
+    container: 'w-24 h-24', 
     stroke: 4,
-    radius: 40,
+    radius: 42,
     text: 'text-sm',
     iconSize: 'w-4 h-4'
   },
-  md: {
-    container: 'w-32 h-32', 
-    stroke: 6,
-    radius: 56,
+  lg: {
+    container: 'w-28 h-28',
+    stroke: 5, 
+    radius: 50,
     text: 'text-base',
     iconSize: 'w-5 h-5'
-  },
-  lg: {
-    container: 'w-40 h-40',
-    stroke: 8, 
-    radius: 72,
-    text: 'text-lg',
-    iconSize: 'w-6 h-6'
   }
 };
 
@@ -104,16 +104,16 @@ export function CircularGauge({
   }, [normalizedValue]);
 
   return (
-    <Card variant="glass" className="p-6 text-center hover:shadow-lg hover:shadow-current/10 transition-all duration-500">
-      <CardContent className="space-y-4">
+    <Card variant="glass" className="p-4 text-center hover:shadow-lg hover:shadow-current/10 transition-all duration-500">
+      <CardContent className="space-y-3">
         {/* Circular Progress */}
-        <div className="relative mx-auto" style={{ width: '160px', height: '160px' }}>
+        <div className="relative mx-auto" style={{ width: '120px', height: '120px' }}>
           {/* Background Circle */}
-          <svg className="w-full h-full -rotate-90" viewBox="0 0 160 160">
+          <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
             <circle
-              cx="80"
-              cy="80"
-              r={sizing.radius}
+              cx="60"
+              cy="60"
+              r={sizing.radius * 0.75}
               stroke="currentColor"
               strokeWidth={sizing.stroke}
               fill="none"
@@ -122,16 +122,16 @@ export function CircularGauge({
             
             {/* Progress Circle */}
             <motion.circle
-              cx="80"
-              cy="80"
-              r={sizing.radius}
+              cx="60"
+              cy="60"
+              r={sizing.radius * 0.75}
               stroke="url(#gradient)"
               strokeWidth={sizing.stroke}
               fill="none"
               strokeLinecap="round"
-              strokeDasharray={strokeDasharray}
-              initial={{ strokeDashoffset: circumference }}
-              animate={{ strokeDashoffset }}
+              strokeDasharray={strokeDasharray * 0.75}
+              initial={{ strokeDashoffset: circumference * 0.75 }}
+              animate={{ strokeDashoffset: strokeDashoffset * 0.75 }}
               transition={{ duration: 1.5, ease: [0.23, 1, 0.32, 1] }}
               className={`drop-shadow-lg ${colors.glow}`}
             />
@@ -307,8 +307,8 @@ export function ThreatLevelIndicator({ level, description }: ThreatLevelIndicato
   const config = getLevelConfig(level);
 
   return (
-    <Card variant="glass" className={`p-6 border-l-4 border-l-${config.color === 'normal' ? 'status-normal' : config.color === 'critical' ? 'status-critical' : config.color === 'warning' ? 'status-warning' : 'cyber-500'}`}>
-      <CardContent className="space-y-4">
+    <Card variant="glass" className={`p-4 border-l-4 border-l-${config.color === 'normal' ? 'status-normal' : config.color === 'critical' ? 'status-critical' : config.color === 'warning' ? 'status-warning' : 'cyber-500'}`}>
+      <CardContent className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className={`w-4 h-4 rounded-full animate-pulse ${

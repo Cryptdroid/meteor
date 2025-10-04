@@ -8,16 +8,61 @@ import { ImpactStatistics } from './ImpactStatistics';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 
 export default function ImpactResults() {
-  const { simulationResults, selectedAsteroid, isSimulating } = useAppStore();
+  const { simulationResults, selectedAsteroid, isSimulating, impactParameters } = useAppStore();
 
   if (!simulationResults && !isSimulating) {
     return (
-      <Card variant="glass" className="h-full flex items-center justify-center">
-        <CardContent className="py-12 text-center text-stellar-light/60">
-          <Target className="w-16 h-16 mx-auto mb-4 opacity-30" />
-          <h3 className="text-lg font-semibold mb-2 text-white">Ready for Impact Analysis</h3>
-          <p>Select an asteroid and run a simulation to see detailed impact results</p>
-        </CardContent>
+      <Card variant="glass" className="p-4">
+        <div className="flex items-center gap-3 mb-3">
+          <Target className="w-5 h-5 text-cyber-400" />
+          <h3 className="text-lg font-semibold text-white">Impact Parameters</h3>
+        </div>
+        
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center p-3 rounded bg-stellar-surface/20">
+              <div className="text-cyber-400 text-xl font-bold font-mono">
+                {impactParameters.size.toLocaleString()}
+              </div>
+              <div className="text-xs text-stellar-light/60 mt-1">meters diameter</div>
+            </div>
+            
+            <div className="text-center p-3 rounded bg-stellar-surface/20">
+              <div className="text-matrix-400 text-xl font-bold font-mono">
+                {impactParameters.density.toLocaleString()}
+              </div>
+              <div className="text-xs text-stellar-light/60 mt-1">kg/m³ density</div>
+            </div>
+            
+            <div className="text-center p-3 rounded bg-stellar-surface/20">
+              <div className="text-status-warning text-xl font-bold font-mono">
+                {impactParameters.velocity}
+              </div>
+              <div className="text-xs text-stellar-light/60 mt-1">km/s velocity</div>
+            </div>
+            
+            <div className="text-center p-3 rounded bg-stellar-surface/20">
+              <div className="text-status-caution text-xl font-bold font-mono">
+                {impactParameters.angle}°
+              </div>
+              <div className="text-xs text-stellar-light/60 mt-1">entry angle</div>
+            </div>
+          </div>
+          
+          <div className="text-center p-3 rounded bg-cyber-500/10 border border-cyber-500/30">
+            <div className="text-cyber-400 font-mono text-sm">
+              Impact Location: {impactParameters.impactLocation.lat.toFixed(2)}°, {impactParameters.impactLocation.lng.toFixed(2)}°
+            </div>
+          </div>
+          
+          {selectedAsteroid && (
+            <div className="text-center p-2 rounded bg-matrix-500/10 border border-matrix-500/30">
+              <div className="text-matrix-400 text-sm font-medium">
+                Selected: {selectedAsteroid.name}
+              </div>
+            </div>
+          )}
+        </div>
       </Card>
     );
   }
@@ -80,12 +125,79 @@ export default function ImpactResults() {
   };
 
   return (
-    <div className="space-y-6">
-      <ImpactStatistics
-        asteroidData={asteroidData}
-        impactResults={impactResults}
-        threatLevel={getThreatLevel()}
-      />
+    <div className="space-y-4">
+      {/* Compact Impact Summary */}
+      <Card variant="glass" className="p-4">
+        <div className="flex items-center gap-3 mb-3">
+          <AlertTriangle className={`w-5 h-5 ${
+            getThreatLevel() === 'extreme' ? 'text-status-critical' :
+            getThreatLevel() === 'high' ? 'text-status-warning' :
+            getThreatLevel() === 'moderate' ? 'text-status-caution' :
+            'text-cyber-400'
+          }`} />
+          <h3 className="text-lg font-semibold text-white">Impact Analysis Results</h3>
+          <div className={`px-3 py-1 rounded-full text-xs font-bold ${
+            getThreatLevel() === 'extreme' ? 'bg-status-critical/20 text-status-critical' :
+            getThreatLevel() === 'high' ? 'bg-status-warning/20 text-status-warning' :
+            getThreatLevel() === 'moderate' ? 'bg-status-caution/20 text-status-caution' :
+            'bg-cyber-500/20 text-cyber-400'
+          }`}>
+            {getThreatLevel().toUpperCase()} THREAT
+          </div>
+        </div>
+        
+        {/* Impact Metrics Grid - 2x2 Layout */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="text-center p-4 rounded bg-stellar-surface/20 border border-cyber-500/20">
+            <div className="text-cyber-400 text-2xl font-bold font-mono mb-1">
+              {energy.megatonsTNT.toFixed(1)}
+            </div>
+            <div className="text-sm text-stellar-light/80 font-medium">MT TNT</div>
+            <div className="text-xs text-stellar-light/60 mt-1">Kinetic Energy</div>
+          </div>
+          
+          <div className="text-center p-4 rounded bg-stellar-surface/20 border border-matrix-500/20">
+            <div className="text-matrix-400 text-2xl font-bold font-mono mb-1">
+              {(crater.diameter / 1000).toFixed(1)}
+            </div>
+            <div className="text-sm text-stellar-light/80 font-medium">km diameter</div>
+            <div className="text-xs text-stellar-light/60 mt-1">Crater Size</div>
+          </div>
+          
+          <div className="text-center p-4 rounded bg-stellar-surface/20 border border-status-warning/20">
+            <div className="text-status-warning text-2xl font-bold font-mono mb-1">
+              {seismic.magnitude.toFixed(1)}
+            </div>
+            <div className="text-sm text-stellar-light/80 font-medium">magnitude</div>
+            <div className="text-xs text-stellar-light/60 mt-1">Seismic Impact</div>
+          </div>
+          
+          <div className="text-center p-4 rounded bg-stellar-surface/20 border border-status-critical/20">
+            <div className="text-status-critical text-2xl font-bold font-mono mb-1">
+              {casualties?.estimated ? (casualties.estimated / 1000000).toFixed(1) + 'M' : '0'}
+            </div>
+            <div className="text-sm text-stellar-light/80 font-medium">casualties</div>
+            <div className="text-xs text-stellar-light/60 mt-1">Estimated Impact</div>
+          </div>
+        </div>
+        
+        {/* Secondary Effects */}
+        <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-stellar-surface/30">
+          <div className="text-center p-3 rounded bg-stellar-deep/30">
+            <div className="text-cyber-400 text-xl font-bold font-mono mb-1">
+              {atmospheric.thermalRadiation.toFixed(0)} km
+            </div>
+            <div className="text-sm text-stellar-light/80">Thermal Radius</div>
+          </div>
+          
+          <div className="text-center p-3 rounded bg-stellar-deep/30">
+            <div className="text-matrix-400 text-xl font-bold font-mono mb-1">
+              {atmospheric.fireballRadius.toFixed(1)} km
+            </div>
+            <div className="text-sm text-stellar-light/80">Fireball Radius</div>
+          </div>
+        </div>
+      </Card>
       
       {/* Additional Impact Location Details */}
       {terrainType && (
@@ -94,42 +206,40 @@ export default function ImpactResults() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
         >
-          <Card variant="glass" className="p-6">
-            <div className="flex items-center gap-3 mb-4">
+          <Card variant="glass" className="p-4">
+            <div className="flex items-center gap-3 mb-3">
               <Target className="w-5 h-5 text-cyber-400" />
-              <h3 className="text-lg font-semibold text-white">Impact Site Analysis</h3>
+              <h3 className="font-semibold text-white">Impact Site</h3>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="space-y-2">
-                <div className="text-stellar-light/60 text-sm font-medium">Terrain Type</div>
-                <div className="text-cyber-400 text-lg font-bold capitalize">{terrainType}</div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="text-center">
+                <div className="text-cyber-400 font-bold capitalize">{terrainType}</div>
+                <div className="text-xs text-stellar-light/60">Terrain</div>
               </div>
               
               {elevation !== undefined && (
-                <div className="space-y-2">
-                  <div className="text-stellar-light/60 text-sm font-medium">Elevation</div>
-                  <div className="text-matrix-400 text-lg font-bold font-mono">
-                    {elevation.toFixed(0)}
-                    <span className="text-xs text-stellar-light/60 ml-1">m</span>
+                <div className="text-center">
+                  <div className="text-matrix-400 font-bold font-mono">
+                    {elevation.toFixed(0)}m
                   </div>
+                  <div className="text-xs text-stellar-light/60">Elevation</div>
                 </div>
               )}
               
               {populationDensity !== undefined && (
-                <div className="space-y-2">
-                  <div className="text-stellar-light/60 text-sm font-medium">Population Density</div>
-                  <div className="text-status-warning text-lg font-bold font-mono">
-                    {populationDensity.toFixed(0)}
-                    <span className="text-xs text-stellar-light/60 ml-1">/km²</span>
+                <div className="text-center">
+                  <div className="text-status-warning font-bold font-mono">
+                    {populationDensity.toFixed(0)}/km²
                   </div>
+                  <div className="text-xs text-stellar-light/60">Population</div>
                 </div>
               )}
               
               {nearestCity && (
-                <div className="space-y-2">
-                  <div className="text-stellar-light/60 text-sm font-medium">Nearest City</div>
-                  <div className="text-status-critical text-lg font-bold">{nearestCity}</div>
+                <div className="text-center">
+                  <div className="text-status-critical font-bold">{nearestCity}</div>
+                  <div className="text-xs text-stellar-light/60">Nearest City</div>
                 </div>
               )}
             </div>

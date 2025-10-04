@@ -18,13 +18,13 @@ export default function DashboardView() {
   const { isLoading, error, lastUpdated, refetch } = useDynamicNASAData();
 
   return (
-    <div className="pt-24 pb-8 min-h-screen bg-stellar-void">
+    <div className="pt-20 pb-6 min-h-screen bg-stellar-void">
       {/* Status Bar */}
-      <div className="container mx-auto px-4 lg:px-6 mb-6">
+      <div className="container mx-auto px-4 lg:px-6 mb-4">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-panel border border-stellar-surface/30 rounded-2xl p-4 flex items-center justify-between"
+          className="glass-panel border border-stellar-surface/30 rounded-xl p-3 flex items-center justify-between"
         >
           <div className="flex items-center gap-4">
             {isLoading ? (

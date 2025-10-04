@@ -71,17 +71,17 @@ export function RealTimeDataPanel() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* System Status Overview */}
-      <Card variant="glass" className="p-6">
-        <CardHeader>
+      <Card variant="glass" className="p-4">
+        <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-cyber-400">
             <Activity className="w-5 h-5" />
             Global Detection Network Status
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 gap-4">
             <CircularGauge
               value={metrics.systemStatus}
               max={100}
@@ -89,7 +89,7 @@ export function RealTimeDataPanel() {
               unit="%"
               color={getSystemStatusColor(metrics.systemStatus)}
               icon={Shield}
-              size="md"
+              size="sm"
             />
             
             <CircularGauge
@@ -99,7 +99,7 @@ export function RealTimeDataPanel() {
               unit="%"
               color={getThreatLevelColor(metrics.threatLevel)}
               icon={Activity}
-              size="md"
+              size="sm"
             />
             
             <CircularGauge
@@ -109,7 +109,7 @@ export function RealTimeDataPanel() {
               unit="%"
               color="matrix"
               icon={Eye}
-              size="md"
+              size="sm"
             />
             
             <CircularGauge
@@ -119,22 +119,22 @@ export function RealTimeDataPanel() {
               unit=""
               color="cyber"
               icon={Satellite}
-              size="md"
+              size="sm"
             />
           </div>
         </CardContent>
       </Card>
 
       {/* Detection Statistics */}
-      <Card variant="glass" className="p-6">
-        <CardHeader>
+      <Card variant="glass" className="p-4">
+        <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-matrix-400">
             <Radar className="w-5 h-5" />
             Detection & Discovery Metrics
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
             <LinearGauge
               value={metrics.scanningProgress}
               max={100}
@@ -155,30 +155,30 @@ export function RealTimeDataPanel() {
           </div>
           
           {/* Key Statistics */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-stellar-surface/30">
-            <div className="text-center space-y-2">
-              <div className="text-cyber-400 text-2xl font-bold font-mono">
+          <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-stellar-surface/30">
+            <div className="text-center space-y-1 p-2 rounded bg-stellar-surface/20">
+              <div className="text-cyber-400 text-lg font-bold font-mono">
                 {metrics.trackedObjects.toLocaleString()}
               </div>
-              <div className="text-stellar-light/60 text-sm">
+              <div className="text-stellar-light/60 text-xs">
                 Total Tracked Objects
               </div>
             </div>
             
-            <div className="text-center space-y-2">
-              <div className="text-matrix-400 text-2xl font-bold font-mono">
+            <div className="text-center space-y-1 p-2 rounded bg-stellar-surface/20">
+              <div className="text-matrix-400 text-lg font-bold font-mono">
                 {metrics.newDiscoveries}
               </div>
-              <div className="text-stellar-light/60 text-sm">
+              <div className="text-stellar-light/60 text-xs">
                 Discoveries Today
               </div>
             </div>
             
-            <div className="text-center space-y-2">
-              <div className="text-status-warning text-2xl font-bold font-mono">
+            <div className="text-center space-y-1 p-2 rounded bg-stellar-surface/20">
+              <div className="text-status-warning text-lg font-bold font-mono">
                 {metrics.activeObservatories}
               </div>
-              <div className="text-stellar-light/60 text-sm">
+              <div className="text-stellar-light/60 text-xs">
                 Active Observatories
               </div>
             </div>
@@ -187,15 +187,15 @@ export function RealTimeDataPanel() {
       </Card>
 
       {/* System Information */}
-      <Card variant="glass" className="p-6">
-        <CardHeader>
+      <Card variant="glass" className="p-4">
+        <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-status-normal">
             <Clock className="w-5 h-5" />
             System Information
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-4">
               <div>
                 <div className="text-stellar-light/60 text-sm font-medium mb-1">

@@ -23,10 +23,10 @@ export default function AsteroidList() {
   });
 
   return (
-    <Card className="h-[calc(100vh-8rem)] flex flex-col">
-      <CardHeader>
+    <Card variant="glass" className="h-[450px] flex flex-col">
+      <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2">
-          <AlertTriangle className="w-5 h-5 text-space-cyan" />
+          <AlertTriangle className="w-5 h-5 text-cyber-400" />
           Near-Earth Objects
         </CardTitle>
         <CardDescription>
@@ -58,26 +58,26 @@ export default function AsteroidList() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
               onClick={() => setSelectedAsteroid(asteroid)}
-              className={`p-4 rounded-lg cursor-pointer transition-all ${
+              className={`p-3 rounded-lg cursor-pointer transition-all ${
                 isSelected
-                  ? 'bg-gradient-to-r from-space-cyan/20 to-space-neon/20 neon-border'
-                  : 'bg-white/5 hover:bg-white/10'
+                  ? 'bg-gradient-to-r from-cyber-500/20 to-matrix-500/20 border border-cyber-500/50'
+                  : 'bg-stellar-surface/30 hover:bg-stellar-surface/50'
               }`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-white truncate">{asteroid.name}</h3>
-                  <div className="mt-2 space-y-1 text-xs">
-                    <p className="text-gray-400 flex items-center">
-                      Size: <span className="text-space-cyan ml-1">{(size * 1000).toFixed(0)}m</span>
+                  <h3 className="font-semibold text-white truncate text-sm">{asteroid.name}</h3>
+                  <div className="mt-1 space-y-1 text-xs">
+                    <p className="text-stellar-light/60 flex items-center">
+                      Size: <span className="text-cyber-400 ml-1">{(size * 1000).toFixed(0)}m</span>
                       <InfoTooltip 
                         title="Asteroid Diameter"
                         description="Larger asteroids cause exponentially more damage. A 100m asteroid destroys a city, while a 10km asteroid causes mass extinction."
                         size="sm"
                       />
                     </p>
-                    <p className="text-gray-400 flex items-center">
-                      Velocity: <span className="text-space-cyan ml-1">{parseFloat(velocity).toFixed(1)} km/s</span>
+                    <p className="text-stellar-light/60 flex items-center">
+                      Velocity: <span className="text-matrix-400 ml-1">{parseFloat(velocity).toFixed(1)} km/s</span>
                       <InfoTooltip 
                         termKey="velocity"
                         size="sm"

@@ -126,7 +126,7 @@ export default function ImpactMap() {
         </p>
       </CardHeader>
       <CardContent>
-        <div className="h-[500px] rounded-lg overflow-hidden">
+        <div className="h-[300px] rounded-lg overflow-hidden">
           <MapContainer
             center={[lat, lng]}
             zoom={6}
@@ -134,8 +134,8 @@ export default function ImpactMap() {
             className="z-0"
           >
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | &copy; <a href="https://cartodb.com/attributions">CartoDB</a>'
+              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
             />
             <MapController />
             <MapClickHandler />
@@ -245,42 +245,37 @@ export default function ImpactMap() {
         </div>
 
         {/* Legend */}
-        <div className="mt-4 space-y-2">
-          <div className="text-xs font-semibold text-gray-300 mb-2">Impact Zones (in order of severity):</div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div className="mt-3 space-y-2">
+          <div className="text-xs font-semibold text-gray-300 mb-2">Impact Zones:</div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
             <div className="flex items-center gap-2 p-2 rounded bg-white/5">
-              <div className="w-3 h-3 rounded-full bg-red-500 flex-shrink-0" />
+              <div className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />
               <div className="text-xs">
-                <div className="text-white font-medium">Crater</div>
-                <div className="text-gray-400">Complete destruction</div>
+                <div className="text-white font-medium text-xs">Crater</div>
               </div>
             </div>
             <div className="flex items-center gap-2 p-2 rounded bg-white/5">
-              <div className="w-3 h-3 rounded-full bg-orange-500 flex-shrink-0" />
+              <div className="w-2 h-2 rounded-full bg-orange-500 flex-shrink-0" />
               <div className="text-xs">
-                <div className="text-white font-medium">Fireball</div>
-                <div className="text-gray-400">Vaporization zone</div>
+                <div className="text-white font-medium text-xs">Fireball</div>
               </div>
             </div>
             <div className="flex items-center gap-2 p-2 rounded bg-white/5">
-              <div className="w-3 h-3 rounded-full bg-yellow-500 flex-shrink-0" />
+              <div className="w-2 h-2 rounded-full bg-yellow-500 flex-shrink-0" />
               <div className="text-xs">
-                <div className="text-white font-medium">Thermal</div>
-                <div className="text-gray-400">3rd degree burns</div>
+                <div className="text-white font-medium text-xs">Thermal</div>
               </div>
             </div>
             <div className="flex items-center gap-2 p-2 rounded bg-white/5">
-              <div className="w-3 h-3 rounded-full bg-orange-600 flex-shrink-0" />
+              <div className="w-2 h-2 rounded-full bg-orange-600 flex-shrink-0" />
               <div className="text-xs">
-                <div className="text-white font-medium">Overpressure</div>
-                <div className="text-gray-400">Building collapse</div>
+                <div className="text-white font-medium text-xs">Blast</div>
               </div>
             </div>
             <div className="flex items-center gap-2 p-2 rounded bg-white/5">
-              <div className="w-3 h-3 rounded-full bg-purple-500 flex-shrink-0 opacity-50" />
+              <div className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0 opacity-50" />
               <div className="text-xs">
-                <div className="text-white font-medium">Seismic</div>
-                <div className="text-gray-400">Earthquake effects (dashed)</div>
+                <div className="text-white font-medium text-xs">Seismic</div>
               </div>
             </div>
             {simulationResults?.tsunami && (

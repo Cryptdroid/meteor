@@ -74,12 +74,12 @@ export default function UnifiedSimulationView() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+        className="mb-4"
       >
-        <Card variant="glass" className="p-6">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <Card variant="glass" className="p-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             {/* Status Information */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
                 <div className={`w-4 h-4 rounded-full animate-pulse ${
                   status.status === 'critical' ? 'bg-status-critical shadow-lg shadow-status-critical/50' :
@@ -146,7 +146,7 @@ export default function UnifiedSimulationView() {
 
           {/* Quick Stats */}
           {simulationResults && (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6 pt-6 border-t border-stellar-surface/20">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4 pt-4 border-t border-stellar-surface/20">
               <CardMetric 
                 label="Impact Energy" 
                 value={`${simulationResults.energy.megatonsTNT.toFixed(1)}MT`}
@@ -183,53 +183,70 @@ export default function UnifiedSimulationView() {
           transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
         >
           {viewMode === 'overview' && (
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-              {/* Left Panel - Asteroid List & Controls */}
-              <div className="xl:col-span-3 space-y-6">
-                <AsteroidList />
-                <ControlPanel />
-              </div>
+            <>
+              {!simulationResults ? (
+                // Pre-simulation layout - optimized grid
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  {/* Left Column - Asteroid List & Controls */}
+                  <div className="space-y-4">
+                    <AsteroidList />
+                    <ControlPanel />
+                  </div>
 
-              {/* Center Panel - 3D Visualization */}
-              {showOrbitalView && (
-                <div className="xl:col-span-6">
-                  <Card variant="glass" className="h-[600px]">
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="flex items-center gap-2">
-                          <Target className="w-5 h-5 text-cyber-400" />
-                          Orbital Mechanics
-                        </CardTitle>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          onClick={() => setViewMode('3d-focus')}
-                        >
-                          <Maximize2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="h-[calc(100%-4rem)]">
-                      <div className="h-full">
-                        <OrbitalView embedded />
-                      </div>
-                    </CardContent>
-                  </Card>
+                  {/* Right 2 Columns - Global Detection Network spanning 2 columns horizontally */}
+                  <div className="lg:col-span-2">
+                    <RealTimeDataPanel />
+                  </div>
+                </div>
+              ) : (
+                // Post-simulation layout - horizontal for results
+                <div className="space-y-4">
+                  {/* Top Row - Controls and Asteroid List */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <AsteroidList />
+                    <ControlPanel />
+                  </div>
+                  
+                  {/* Bottom Row - Results and Map side by side */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <ImpactResults />
+                    <ImpactMap />
+                  </div>
+                  
+                  {/* Optional 3D View */}
+                  {showOrbitalView && (
+                    <Card variant="glass" className="h-[400px]">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="flex items-center gap-2">
+                            <Target className="w-5 h-5 text-cyber-400" />
+                            Orbital Mechanics
+                          </CardTitle>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => setViewMode('3d-focus')}
+                          >
+                            <Maximize2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="h-[calc(100%-4rem)]">
+                        <div className="h-full">
+                          <OrbitalView embedded />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
                 </div>
               )}
-
-              {/* Right Panel - Results & Map */}
-              <div className={`space-y-6 ${showOrbitalView ? 'xl:col-span-3' : 'xl:col-span-9'}`}>
-                <ImpactResults />
-                <ImpactMap />
-              </div>
-            </div>
+            </>
           )}
 
           {viewMode === '3d-focus' && (
-            <div className="space-y-6">
-              <Card variant="glass" className="h-[calc(100vh-16rem)]">
-                <CardHeader className="pb-4">
+            <div className="space-y-4">
+              <Card variant="glass" className="h-[calc(100vh-14rem)]">
+                <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2">
                       <Satellite className="w-5 h-5 text-cyber-400" />
@@ -249,12 +266,12 @@ export default function UnifiedSimulationView() {
                     </p>
                   )}
                 </CardHeader>
-                <CardContent className="h-[calc(100%-6rem)]">
+                <CardContent className="h-[calc(100%-5rem)]">
                   <OrbitalView embedded />
                 </CardContent>
               </Card>
               
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <AsteroidList />
                 <ControlPanel />
                 <ImpactResults />
@@ -263,15 +280,15 @@ export default function UnifiedSimulationView() {
           )}
 
           {viewMode === 'data-focus' && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               {/* Left Column */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <AsteroidList />
                 <ControlPanel />
               </div>
               
               {/* Middle Column */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <ImpactResults />
                 <ImpactMap />
               </div>

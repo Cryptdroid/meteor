@@ -83,7 +83,7 @@ export function ImpactStatistics({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       {/* Threat Level Assessment */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -102,15 +102,15 @@ export function ImpactStatistics({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        <Card variant="glass" className="p-6">
-          <CardHeader>
+        <Card variant="glass" className="p-4">
+          <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-cyber-400">
               <Zap className="w-5 h-5" />
               Primary Impact Assessment
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <CircularGauge
                 value={impactResults.kineticEnergy}
                 max={1000000}
@@ -161,15 +161,15 @@ export function ImpactStatistics({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.4 }}
       >
-        <Card variant="glass" className="p-6">
-          <CardHeader>
+        <Card variant="glass" className="p-4">
+          <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-matrix-400">
               <Globe className="w-5 h-5" />
               Environmental Effects Analysis
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <LinearGauge
                 value={impactResults.seismicMagnitude}
                 max={10}
@@ -216,8 +216,8 @@ export function ImpactStatistics({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.6 }}
       >
-        <Card variant="glass" className="p-6">
-          <CardHeader>
+        <Card variant="glass" className="p-4">
+          <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-cyber-400">
               <Mountain className="w-5 h-5" />
               Asteroid Physical Properties
