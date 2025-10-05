@@ -1,22 +1,48 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse
-import sys
+from http.server import BaseHTTPRequestHandler
+import json
 import os
 import requests
 from datetime import datetime, timedelta
-
-# Add backend to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
-
-app = FastAPI()
+from urllib.parse import urlparse, parse_qs
 
 NASA_API_BASE = "https://api.nasa.gov/neo/rest/v1"
 NASA_API_KEY = os.getenv("NASA_API_KEY", "DEMO_KEY")
 
-@app.get("/")
-async def get_asteroids():
-    """Get Near-Earth Objects from NASA API"""
-    try:
+class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        try:
+            # Parse the path to determine which endpoint
+            parsed_path = urlparse(self.path)
+            path = parsed_path.path
+            
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            
+            if "potentially-hazardous" in path:
+                response = self.get_hazardous_asteroids()
+            else:
+                response = self.get_asteroids()
+            
+            self.wfile.write(json.dumps(response).encode())
+            
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            error_response = {"error": str(e), "status": "error"}
+            self.wfile.write(json.dumps(error_response).encode())
+    
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
+    
+    def get_asteroids(self):
+        """Get Near-Earth Objects from NASA API"""
         # Get asteroids for the next 7 days
         start_date = datetime.now().strftime("%Y-%m-%d")
         end_date = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
@@ -44,24 +70,17 @@ async def get_asteroids():
                 reverse=True
             )
             
-            return JSONResponse({
+            return {
                 "count": len(asteroids),
                 "asteroids": asteroids[:50],  # Limit to 50 for performance
                 "source": "NASA NeoWs API",
                 "generated_at": datetime.now().isoformat()
-            })
+            }
         else:
-            raise HTTPException(status_code=response.status_code, detail="NASA API error")
-            
-    except requests.RequestException as e:
-        raise HTTPException(status_code=503, detail=f"Service unavailable: {str(e)}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
-
-@app.get("/potentially-hazardous")
-async def get_hazardous_asteroids():
-    """Get only potentially hazardous asteroids"""
-    try:
+            raise Exception(f"NASA API error: {response.status_code}")
+    
+    def get_hazardous_asteroids(self):
+        """Get only potentially hazardous asteroids"""
         url = f"{NASA_API_BASE}/neo/browse"
         params = {
             "api_key": NASA_API_KEY,
@@ -73,17 +92,10 @@ async def get_hazardous_asteroids():
         
         if response.status_code == 200:
             data = response.json()
-            return JSONResponse({
+            return {
                 "count": len(data.get("near_earth_objects", [])),
                 "asteroids": data.get("near_earth_objects", []),
                 "source": "NASA NeoWs API - PHAs only"
-            })
+            }
         else:
-            raise HTTPException(status_code=response.status_code, detail="NASA API error")
-            
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-# Vercel handler
-def handler(request):
-    return app(request)
+            raise Exception(f"NASA API error: {response.status_code}")
