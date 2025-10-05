@@ -11,7 +11,6 @@ const StorytellingLanding = dynamic(() => import('@/components/landing/Storytell
 export default function Home() {
   return (
     <main className="mobile-safe-area">
-      <Header />
       <Suspense fallback={<LoadingScreen />}>
         <StorytellingLanding />
       </Suspense>
