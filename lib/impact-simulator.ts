@@ -146,7 +146,7 @@ static calculateSeismicEffects(params: ImpactParameters): {
   static async simulate(params: ImpactParameters): Promise<ImpactResults> {
     // Check if backend usage is enabled
     const useBackend = process.env.NEXT_PUBLIC_USE_BACKEND === 'true';
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
 
     console.log('[DEBUG] Backend config:', {
       useBackend,
@@ -157,8 +157,10 @@ static calculateSeismicEffects(params: ImpactParameters): {
 
     if (useBackend) {
       try {
-        console.log('[DEBUG] Calling backend URL:', `${backendUrl}/api/simulation`);
-        const response = await fetch(`${backendUrl}/api/simulation`, {
+        // Use relative URL if no backend URL is specified (for Vercel serverless functions)
+        const apiUrl = backendUrl ? `${backendUrl}/api/simulation` : '/api/simulation';
+        console.log('[DEBUG] Calling backend URL:', apiUrl);
+        const response = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
