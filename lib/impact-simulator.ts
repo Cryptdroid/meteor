@@ -148,8 +148,16 @@ static calculateSeismicEffects(params: ImpactParameters): {
     const useBackend = process.env.NEXT_PUBLIC_USE_BACKEND === 'true';
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
+    console.log('[DEBUG] Backend config:', {
+      useBackend,
+      backendUrl,
+      env_use_backend: process.env.NEXT_PUBLIC_USE_BACKEND,
+      env_backend_url: process.env.NEXT_PUBLIC_BACKEND_URL
+    });
+
     if (useBackend) {
       try {
+        console.log('[DEBUG] Calling backend URL:', `${backendUrl}/api/simulation`);
         const response = await fetch(`${backendUrl}/api/simulation`, {
           method: 'POST',
           headers: {
@@ -170,7 +178,7 @@ static calculateSeismicEffects(params: ImpactParameters): {
 
         if (response.ok) {
           const data = await response.json();
-          console.log('[Backend] Using Python simulation results');
+          console.log('[Backend] Using Python simulation results:', data);
           
           // Transform backend response to match frontend types
           return {
@@ -202,7 +210,7 @@ static calculateSeismicEffects(params: ImpactParameters): {
           };
         }
       } catch (error) {
-        console.warn('[Backend] Failed to connect, falling back to frontend simulation:', error);
+        console.error('[Backend] Failed to connect, falling back to frontend simulation:', error);
       }
     }
 
