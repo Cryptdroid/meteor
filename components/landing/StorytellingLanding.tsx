@@ -81,13 +81,13 @@ export default function StorytellingLanding() {
       {/* Hero Section */}
       <motion.div 
         ref={heroRef}
-        className="relative z-20 min-h-screen flex items-center justify-center px-4 lg:px-6"
+        className="relative z-20 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8"
         style={{ opacity: headerOpacity }}
       >
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <div className="max-w-7xl mx-auto w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-20 items-center">
             {/* Left Column - Hero Content */}
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8 text-center lg:text-left order-2 lg:order-1">
               {/* Status Badge */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -108,14 +108,14 @@ export default function StorytellingLanding() {
                 transition={{ duration: 1, delay: 0.4 }}
                 className="space-y-4"
               >
-                <h1 className="heading-display text-5xl lg:text-7xl xl:text-8xl text-white leading-tight">
-                  Asteroid Defense
+                <h1 className="heading-display text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl text-white leading-tight">
+                  <span className="block">Asteroid Defense</span>
                   <span className="block text-gradient-cyber">
                     Grid System
                   </span>
                 </h1>
                 
-                <p className="text-xl lg:text-2xl text-stellar-light/80 leading-relaxed max-w-2xl">
+                <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-stellar-light/80 leading-relaxed max-w-2xl mx-auto lg:mx-0">
                   Advanced simulation platform for planetary impact scenarios. 
                   Train. Analyze. Defend.
                 </p>
@@ -126,7 +126,7 @@ export default function StorytellingLanding() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.8 }}
-                className="flex flex-col sm:flex-row gap-4"
+                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
               >
                 <Link href="/dashboard">
                   <Button size="xl" className="group gap-3 shadow-2xl shadow-cyber-500/25">
@@ -149,29 +149,29 @@ export default function StorytellingLanding() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 1.0 }}
-                className="grid grid-cols-3 gap-6 pt-8"
+                className="grid grid-cols-3 gap-3 sm:gap-6 pt-8 max-w-md mx-auto lg:max-w-none"
               >
                 <div className="text-center">
-                  <div className="text-3xl lg:text-4xl font-bold text-cyber-400 font-mono">
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-cyber-400 font-mono">
                     30K+
                   </div>
-                  <p className="text-stellar-light/60 text-sm mt-1">
+                  <p className="text-stellar-light/60 text-xs sm:text-sm mt-1">
                     Tracked Objects
                   </p>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl lg:text-4xl font-bold text-matrix-400 font-mono">
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-matrix-400 font-mono">
                     99.7%
                   </div>
-                  <p className="text-stellar-light/60 text-sm mt-1">
+                  <p className="text-stellar-light/60 text-xs sm:text-sm mt-1">
                     Accuracy Rate
                   </p>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl lg:text-4xl font-bold text-status-warning font-mono">
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-status-warning font-mono">
                     24/7
                   </div>
-                  <p className="text-stellar-light/60 text-sm mt-1">
+                  <p className="text-stellar-light/60 text-xs sm:text-sm mt-1">
                     Monitoring
                   </p>
                 </div>
@@ -183,7 +183,7 @@ export default function StorytellingLanding() {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1, delay: 0.6 }}
-              className="space-y-6"
+              className="space-y-4 sm:space-y-6 order-1 lg:order-2"
             >
               <Card variant="glass" className="p-6 hover:cyber-glow transition-all duration-500">
                 <CardHeader>
@@ -238,8 +238,8 @@ export default function StorytellingLanding() {
       </motion.div>
 
       {/* Features Section */}
-      <div ref={featuresRef} className="relative z-20 py-20 lg:py-32">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6">
+      <div ref={featuresRef} className="relative z-20 py-12 sm:py-16 md:py-20 lg:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -255,19 +255,19 @@ export default function StorytellingLanding() {
               </span>
             </div>
             
-            <h2 className="heading-display text-4xl lg:text-6xl text-white mb-6">
-              Advanced Defense
+            <h2 className="heading-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-6">
+              <span className="block">Advanced Defense</span>
               <span className="block text-gradient-matrix">Simulation Suite</span>
             </h2>
             
-            <p className="text-xl text-stellar-light/80 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-stellar-light/80 max-w-3xl mx-auto leading-relaxed px-4 sm:px-0">
               Comprehensive planetary protection tools powered by real astronomical data 
               and cutting-edge simulation technology.
             </p>
           </motion.div>
 
           {/* Feature Grid */}
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
             {/* Real-Time Monitoring */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
@@ -424,8 +424,8 @@ export default function StorytellingLanding() {
       </div>
 
       {/* Data Section */} 
-      <div ref={dataRef} className="relative z-20 py-20 lg:py-32 bg-gradient-to-b from-transparent via-stellar-dark/50 to-transparent">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6">
+      <div ref={dataRef} className="relative z-20 py-12 sm:py-16 md:py-20 lg:py-32 bg-gradient-to-b from-transparent via-stellar-dark/50 to-transparent">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -441,19 +441,19 @@ export default function StorytellingLanding() {
               </span>
             </div>
             
-            <h2 className="heading-display text-4xl lg:text-6xl text-white mb-6">
-              Real Asteroid
+            <h2 className="heading-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-6">
+              <span className="block">Real Asteroid</span>
               <span className="block text-gradient-stellar">Threat Data</span>
             </h2>
             
-            <p className="text-xl text-stellar-light/80 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-stellar-light/80 max-w-3xl mx-auto leading-relaxed px-4 sm:px-0">
               Current near-Earth object statistics and historical impact data 
               from NASA's Center for Near Earth Object Studies.
             </p>
           </motion.div>
 
           {/* Statistics Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
             {[
               { 
                 value: useCounter(34738, dataInView), 
@@ -487,15 +487,15 @@ export default function StorytellingLanding() {
                 transition={{ duration: 0.8, delay: index * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Card variant="glass" className="p-6 text-center hover:interactive-element transition-all duration-300">
+                <Card variant="glass" className="p-4 sm:p-6 text-center hover:interactive-element transition-all duration-300">
                   <CardContent>
-                    <div className={`text-4xl lg:text-5xl font-bold font-mono mb-2 text-${stat.color}-400`}>
+                    <div className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold font-mono mb-2 text-${stat.color}-400`}>
                       {stat.value.toLocaleString()}
                     </div>
-                    <div className="text-white font-semibold mb-1">
+                    <div className="text-white font-semibold mb-1 text-sm sm:text-base">
                       {stat.label}
                     </div>
-                    <p className="text-stellar-light/60 text-sm">
+                    <p className="text-stellar-light/60 text-xs sm:text-sm">
                       {stat.description}
                     </p>
                   </CardContent>
@@ -518,30 +518,30 @@ export default function StorytellingLanding() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-status-critical mb-2">
+                    <div className="text-2xl sm:text-3xl font-bold text-status-critical mb-2">
                       65 MYA
                     </div>
-                    <p className="font-semibold text-white mb-2">Chicxulub Impact</p>
+                    <p className="font-semibold text-white mb-2 text-sm sm:text-base">Chicxulub Impact</p>
                     <p className="text-stellar-light/70 text-sm">
                       10km asteroid ended dinosaur era
                     </p>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-status-warning mb-2">
+                    <div className="text-2xl sm:text-3xl font-bold text-status-warning mb-2">
                       1908
                     </div>
-                    <p className="font-semibold text-white mb-2">Tunguska Event</p>
+                    <p className="font-semibold text-white mb-2 text-sm sm:text-base">Tunguska Event</p>
                     <p className="text-stellar-light/70 text-sm">
                       50m object flattened 2,000 km² of forest
                     </p>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-status-caution mb-2">
+                    <div className="text-2xl sm:text-3xl font-bold text-status-caution mb-2">
                       2013
                     </div>
-                    <p className="font-semibold text-white mb-2">Chelyabinsk</p>
+                    <p className="font-semibold text-white mb-2 text-sm sm:text-base">Chelyabinsk</p>
                     <p className="text-stellar-light/70 text-sm">
                       20m object injured 1,500 people
                     </p>
@@ -554,8 +554,8 @@ export default function StorytellingLanding() {
       </div>
 
       {/* Call to Action Section */}
-      <div className="relative z-20 py-20 lg:py-32">
-        <div className="max-w-6xl mx-auto px-4 lg:px-6">
+      <div className="relative z-20 py-12 sm:py-16 md:py-20 lg:py-32">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -570,37 +570,37 @@ export default function StorytellingLanding() {
               </span>
             </div>
             
-            <h2 className="heading-display text-5xl lg:text-7xl text-white mb-8 leading-tight">
-              Defend
+            <h2 className="heading-display text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-white mb-6 sm:mb-8 leading-tight">
+              <span className="block">Defend</span>
               <span className="block text-gradient-cyber">Earth</span>
             </h2>
             
-            <p className="text-xl lg:text-2xl text-stellar-light/80 max-w-3xl mx-auto leading-relaxed mb-12">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-stellar-light/80 max-w-3xl mx-auto leading-relaxed mb-8 sm:mb-12 px-4 sm:px-0">
               Take command of humanity's most advanced planetary defense systems. 
               Use real NASA data and cutting-edge simulations to protect 
               <span className="text-cyber-400 font-bold"> 8 billion lives</span>.
             </p>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <Link href="/dashboard">
-                <Button size="xl" className="group gap-4 text-lg px-12 py-4 shadow-2xl shadow-cyber-500/25">
-                  <Rocket className="w-6 h-6" />
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 sm:mb-16">
+              <Link href="/dashboard" className="w-full sm:w-auto">
+                <Button size="xl" className="w-full sm:w-auto group gap-3 sm:gap-4 text-base sm:text-lg px-8 sm:px-12 py-3 sm:py-4 shadow-2xl shadow-cyber-500/25">
+                  <Rocket className="w-5 h-5 sm:w-6 sm:h-6" />
                   Launch Simulation
-                  <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                  <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-2 transition-transform" />
                 </Button>
               </Link>
               
-              <Link href="/ar">
-                <Button variant="outline" size="xl" className="gap-4 text-lg px-12 py-4">
-                  <Eye className="w-6 h-6" />
+              <Link href="/ar" className="w-full sm:w-auto">
+                <Button variant="outline" size="xl" className="w-full sm:w-auto gap-3 sm:gap-4 text-base sm:text-lg px-8 sm:px-12 py-3 sm:py-4">
+                  <Eye className="w-5 h-5 sm:w-6 sm:h-6" />
                   AR Experience
                 </Button>
               </Link>
             </div>
 
             {/* Feature Highlights */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
               {[
                 { 
                   icon: Telescope, 
@@ -634,13 +634,13 @@ export default function StorytellingLanding() {
                   transition={{ duration: 0.6, delay: idx * 0.1 }}
                   viewport={{ once: true }}
                   whileHover={{ scale: 1.05, y: -5 }}
-                  className="glass-card p-6 rounded-2xl border border-stellar-surface/30 hover:border-cyber-500/50 transition-all duration-300"
+                  className="glass-card p-4 sm:p-6 rounded-2xl border border-stellar-surface/30 hover:border-cyber-500/50 transition-all duration-300"
                 >
-                  <div className={`w-12 h-12 rounded-xl bg-${feature.color}-500/20 flex items-center justify-center mx-auto mb-4`}>
-                    <feature.icon className={`w-6 h-6 text-${feature.color}-400`} />
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-${feature.color}-500/20 flex items-center justify-center mx-auto mb-3 sm:mb-4`}>
+                    <feature.icon className={`w-5 h-5 sm:w-6 sm:h-6 text-${feature.color}-400`} />
                   </div>
-                  <h3 className="text-white font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-stellar-light/70 text-sm">{feature.description}</p>
+                  <h3 className="text-white font-semibold mb-2 text-sm sm:text-base">{feature.title}</h3>
+                  <p className="text-stellar-light/70 text-xs sm:text-sm">{feature.description}</p>
                 </motion.div>
               ))}
             </div>
@@ -649,9 +649,9 @@ export default function StorytellingLanding() {
       </div>
 
       {/* Footer */}
-      <footer className="relative z-20 border-t border-stellar-surface/30 py-12 bg-stellar-deep/50">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="grid md:grid-cols-3 gap-8 items-center">
+      <footer className="relative z-20 border-t border-stellar-surface/30 py-8 sm:py-12 bg-stellar-deep/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-center text-center md:text-left">
             {/* Logo & Description */}
             <div className="space-y-4">
               <div className="flex items-center gap-3">

@@ -71,21 +71,21 @@ export default function ARPage() {
   }
 
   return (
-    <div className="relative w-full h-screen bg-black overflow-hidden">
+    <div className="relative w-full h-screen bg-black overflow-hidden mobile-safe-area">
       {/* Back Button */}
       <button
         onClick={() => router.back()}
-        className="absolute top-4 left-4 z-50 flex items-center gap-2 bg-gray-900/90 hover:bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg transition-all"
+        className="absolute top-4 left-4 z-50 flex items-center gap-2 bg-gray-900/90 hover:bg-gray-800 text-white px-3 sm:px-4 py-2 rounded-lg shadow-lg transition-all touch-target"
       >
-        <ArrowLeft size={20} />
-        <span>Back</span>
+        <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
+        <span className="text-sm sm:text-base">Back</span>
       </button>
 
 
 
       {/* Error Message */}
       {error && (
-        <div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-900/90 text-yellow-100 px-4 py-2 rounded-lg shadow-lg">
+        <div className="absolute top-16 sm:top-20 left-4 right-4 sm:left-1/2 sm:right-auto sm:transform sm:-translate-x-1/2 z-50 bg-yellow-900/90 text-yellow-100 px-4 py-2 rounded-lg shadow-lg text-sm sm:text-base max-w-sm sm:max-w-md mx-auto sm:mx-0">
           ⚠️ {error}
         </div>
       )}
@@ -98,9 +98,9 @@ export default function ARPage() {
       />
 
       {/* Info Footer */}
-      <div className="absolute bottom-20 left-0 right-0 z-30 flex justify-center">
-        <div className="bg-black/70 text-white px-6 py-3 rounded-lg text-sm max-w-md text-center">
-          <p className="font-semibold text-cyan-400 mb-1">
+      <div className="absolute bottom-16 sm:bottom-20 left-4 right-4 sm:left-0 sm:right-0 z-30 flex justify-center">
+        <div className="bg-black/70 text-white px-4 sm:px-6 py-3 rounded-lg text-sm max-w-sm sm:max-w-md text-center">
+          <p className="font-semibold text-cyan-400 mb-1 text-sm sm:text-base">
             {asteroids.length} Asteroid Orbits Loaded
           </p>
           <p className="text-xs text-gray-300">

@@ -38,8 +38,8 @@ export default function Header() {
         transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
         className="fixed top-0 left-0 right-0 z-50 glass-panel border-b border-stellar-surface/30 backdrop-blur-xl"
       >
-        <div className="container mx-auto px-4 lg:px-6">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className="container mx-auto px-3 sm:px-4 lg:px-6">
+          <div className="flex items-center justify-between h-14 sm:h-16 lg:h-20">
             {/* Logo Section */}
             <Link href="/">
               <motion.div
@@ -56,9 +56,9 @@ export default function Header() {
                     transition={{
                       rotate: { duration: 20, repeat: Infinity, ease: 'linear' },
                     }}
-                    className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl bg-gradient-to-br from-cyber-500 to-matrix-500 flex items-center justify-center relative overflow-hidden"
+                    className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-xl bg-gradient-to-br from-cyber-500 to-matrix-500 flex items-center justify-center relative overflow-hidden"
                   >
-                    <Satellite className="w-5 h-5 lg:w-6 lg:h-6 text-stellar-void z-10" />
+                    <Satellite className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-stellar-void z-10" />
                     {/* Holographic sweep effect */}
                     <motion.div
                       animate={{ x: [-100, 100] }}
@@ -76,10 +76,11 @@ export default function Header() {
 
                 {/* Brand Text */}
                 <div className="hidden sm:block">
-                  <h1 className="heading-display text-lg lg:text-xl text-white group-hover:text-gradient-cyber transition-all duration-300">
-                    Asteroid Defense Grid
+                  <h1 className="heading-display text-base sm:text-lg lg:text-xl text-white group-hover:text-gradient-cyber transition-all duration-300">
+                    <span className="hidden md:inline">Asteroid Defense Grid</span>
+                    <span className="md:hidden">Defense Grid</span>
                   </h1>
-                  <p className="text-xs text-stellar-light/60 font-mono tracking-wider">
+                  <p className="text-xs text-stellar-light/60 font-mono tracking-wider hidden lg:block">
                     Planetary Impact Simulator
                   </p>
                 </div>
@@ -179,10 +180,10 @@ export default function Header() {
           pointerEvents: mobileMenuOpen ? 'all' : 'none'
         }}
         transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-        className="fixed top-16 left-0 right-0 z-40 lg:hidden"
+        className="fixed top-14 sm:top-16 left-0 right-0 z-40 lg:hidden max-h-[80vh] overflow-y-auto"
       >
         <div className="glass-panel border-b border-stellar-surface/30 backdrop-blur-xl">
-          <div className="container mx-auto px-4 py-6 space-y-4">
+          <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-3 sm:space-y-4">
             {/* Mobile Brand */}
             <div className="sm:hidden mb-6">
               <h2 className="heading-display text-lg text-white">

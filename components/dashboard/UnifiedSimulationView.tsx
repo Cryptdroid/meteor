@@ -101,15 +101,15 @@ export default function UnifiedSimulationView() {
   const topThreats = getTopThreats();
 
   return (
-    <div className="container mx-auto px-4 lg:px-6">
+    <div className="container mx-auto px-3 sm:px-4 lg:px-6">
       {/* Simulation Status Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-4"
+        className="mb-3 sm:mb-4"
       >
-        <Card variant="glass" className="p-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <Card variant="glass" className="p-3 sm:p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
             {/* Status Information */}
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
@@ -133,35 +133,35 @@ export default function UnifiedSimulationView() {
             </div>
 
             {/* View Mode Controls */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap gap-1 sm:gap-2">
               <Button
                 variant={viewMode === 'overview' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('overview')}
-                className="gap-2"
+                className="gap-1 sm:gap-2 text-xs sm:text-sm"
               >
-                <Globe className="w-4 h-4" />
-                <span className="hidden sm:inline">Overview</span>
+                <Globe className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Overview</span>
               </Button>
               
               <Button
                 variant={viewMode === '3d-focus' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('3d-focus')}
-                className="gap-2"
+                className="gap-1 sm:gap-2 text-xs sm:text-sm"
               >
-                <Satellite className="w-4 h-4" />
-                <span className="hidden sm:inline">3D Focus</span>
+                <Satellite className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">3D</span>
               </Button>
               
               <Button
                 variant={viewMode === 'data-focus' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('data-focus')}
-                className="gap-2"
+                className="gap-1 sm:gap-2 text-xs sm:text-sm"
               >
-                <Activity className="w-4 h-4" />
-                <span className="hidden sm:inline">Data</span>
+                <Activity className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Data</span>
               </Button>
             </div>
           </div>
@@ -208,47 +208,27 @@ export default function UnifiedSimulationView() {
             <>
               {!simulationResults ? (
                 // Pre-simulation: Mission Control Dashboard Layout
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                  {/* Threat Radar - Full width */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
+                  {/* Threat Radar - Full width on all screens */}
                   <div className="lg:col-span-12">
                     <ThreatRadar />
                   </div>
                   
-                  {/* Top Threat Cards - 3 columns */}
-                  {/* <div className="lg:col-span-4">
-                    <TopThreatCard 
-                      asteroid={topThreats[0]} 
-                      rank={1} 
-                    />
-                  </div>
-                  <div className="lg:col-span-4">
-                    <TopThreatCard 
-                      asteroid={topThreats[1]} 
-                      rank={2} 
-                    />
-                  </div>
-                  <div className="lg:col-span-4">
-                    <TopThreatCard 
-                      asteroid={topThreats[2]} 
-                      rank={3} 
-                    />
-                  </div> */}
-                  
-                  {/* Bottom Row with Control Panel and Overview */}
-                  <div className="lg:col-span-4">
+                  {/* Mobile-first responsive layout */}
+                  <div className="lg:col-span-4 order-2 lg:order-1">
                     <AsteroidList />
                   </div>
-                  <div className="lg:col-span-8">
+                  <div className="lg:col-span-8 order-1 lg:order-2">
                     <ImpactMap />
                   </div>
-                  <div className="lg:col-span-4">
+                  <div className="lg:col-span-4 order-3">
                     <ControlPanel />
                   </div>
                   
                 </div>
               ) : (
                 // Post-simulation: Impact Summary Dashboard
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {/* Back Button */}
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
@@ -258,7 +238,7 @@ export default function UnifiedSimulationView() {
                     <Button
                       variant="outline"
                       onClick={handleBackToSelection}
-                      className="gap-2 mb-4"
+                      className="gap-2 mb-3 sm:mb-4 w-full sm:w-auto"
                     >
                       <ArrowLeft className="w-4 h-4" />
                       New Simulation
@@ -266,7 +246,7 @@ export default function UnifiedSimulationView() {
                   </motion.div>
 
                   {/* Impact Summary Dashboard */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
                     <ImpactResults />
                     <ImpactMap />
                   </div>

@@ -94,6 +94,34 @@
       transition-duration: 0.01ms !important;
     }
   }
+
+  /* Mobile-first responsive improvements */
+  @media (max-width: 768px) {
+    body {
+      -webkit-overflow-scrolling: touch;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Improve touch targets */
+    button, [role="button"], a {
+      min-height: 44px;
+      touch-action: manipulation;
+    }
+    
+    /* Better text rendering on mobile */
+    * {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  }
+  
+  /* High DPI screens */
+  @media (min-resolution: 2dppx) {
+    * {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  }
 }
 
 @layer components {
@@ -282,6 +310,70 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  
+  /* Mobile-specific utilities */
+  .mobile-safe-area {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .mobile-container {
+    @apply px-4 mx-auto max-w-screen-xl;
+  }
+  
+  .mobile-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4;
+  }
+  
+  .mobile-stack {
+    @apply flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4;
+  }
+  
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
+  }
+  
+  .mobile-text-xs {
+    @apply text-xs leading-4;
+  }
+  
+  .mobile-text-sm {
+    @apply text-sm leading-5;
+  }
+  
+  .mobile-text-base {
+    @apply text-base leading-6;
+  }
+  
+  .mobile-text-lg {
+    @apply text-lg leading-7 sm:text-xl sm:leading-8;
+  }
+  
+  .mobile-text-xl {
+    @apply text-xl leading-8 sm:text-2xl sm:leading-9;
+  }
+  
+  .mobile-text-2xl {
+    @apply text-2xl leading-9 sm:text-3xl sm:leading-10;
+  }
+  
+  .mobile-text-3xl {
+    @apply text-3xl leading-10 sm:text-4xl sm:leading-none;
+  }
+  
+  .mobile-text-4xl {
+    @apply text-4xl leading-none sm:text-5xl;
+  }
+  
+  .mobile-heading {
+    @apply text-2xl leading-8 font-bold sm:text-3xl sm:leading-9 md:text-4xl md:leading-10 lg:text-5xl lg:leading-none;
+  }
+  
+  .mobile-subheading {
+    @apply text-lg leading-7 font-semibold sm:text-xl sm:leading-8 md:text-2xl md:leading-9;
   }
 }
 

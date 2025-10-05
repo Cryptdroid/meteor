@@ -18,7 +18,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={inter.className}>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=1, viewport-fit=cover" />
+        <meta name="theme-color" content="#0B0D0F" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="format-detection" content="telephone=no" />
+      </head>
+      <body className={`${inter.className} overflow-x-hidden min-h-screen touch-manipulation`}>
         <ColorblindWrapper>
           {children}
         </ColorblindWrapper>

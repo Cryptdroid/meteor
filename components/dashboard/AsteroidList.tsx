@@ -23,28 +23,29 @@ export default function AsteroidList() {
   });
 
   return (
-    <Card variant="glass" className="h-[560px] flex flex-col">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2">
-          <AlertTriangle className="w-5 h-5 text-cyber-400" />
-          Near-Earth Objects
+    <Card variant="glass" className="h-[400px] sm:h-[500px] lg:h-[560px] flex flex-col">
+      <CardHeader className="pb-3 px-4 sm:px-6">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+          <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-cyber-400" />
+          <span className="hidden sm:inline">Near-Earth Objects</span>
+          <span className="sm:hidden">NEOs</span>
         </CardTitle>
-        <CardDescription>
-          {asteroidList.length} asteroids detected
+        <CardDescription className="text-sm">
+          {asteroidList.length} asteroid{asteroidList.length !== 1 ? 's' : ''} detected
         </CardDescription>
         
-        <div className="relative mt-4">
+        <div className="relative mt-3 sm:mt-4">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
             placeholder="Search asteroids..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 text-sm"
           />
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 overflow-y-auto space-y-2">
+      <CardContent className="flex-1 overflow-y-auto space-y-2 px-4 sm:px-6 custom-scrollbar">
         {sortedAsteroids.map((asteroid, index) => {
           const size = asteroid.estimated_diameter.kilometers.estimated_diameter_max;
           const velocity = asteroid.close_approach_data[0]?.relative_velocity.kilometers_per_second || '0';
@@ -58,26 +59,28 @@ export default function AsteroidList() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
               onClick={() => setSelectedAsteroid(asteroid)}
-              className={`p-3 rounded-lg cursor-pointer transition-all ${
+              className={`p-3 rounded-lg cursor-pointer transition-all touch-target ${
                 isSelected
                   ? 'bg-gradient-to-r from-cyber-500/20 to-matrix-500/20 border border-cyber-500/50'
-                  : 'bg-stellar-surface/30 hover:bg-stellar-surface/50'
+                  : 'bg-stellar-surface/30 hover:bg-stellar-surface/50 active:bg-stellar-surface/60'
               }`}
             >
               <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h3 className="font-semibold text-white truncate text-sm">{asteroid.name}</h3>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-white truncate text-sm sm:text-base">{asteroid.name}</h3>
                   <div className="mt-1 space-y-1 text-xs">
-                    <p className="text-stellar-light/60 flex items-center">
-                      Size: <span className="text-cyber-400 ml-1">{(size * 1000).toFixed(0)}m</span>
+                    <p className="text-stellar-light/60 flex items-center flex-wrap">
+                      <span>Size:</span>
+                      <span className="text-cyber-400 ml-1">{(size * 1000).toFixed(0)}m</span>
                       <InfoTooltip 
                         title="Asteroid Diameter"
                         description="Larger asteroids cause exponentially more damage. A 100m asteroid destroys a city, while a 10km asteroid causes mass extinction."
                         size="sm"
                       />
                     </p>
-                    <p className="text-stellar-light/60 flex items-center">
-                      Velocity: <span className="text-matrix-400 ml-1">{parseFloat(velocity).toFixed(1)} km/s</span>
+                    <p className="text-stellar-light/60 flex items-center flex-wrap">
+                      <span>Velocity:</span>
+                      <span className="text-matrix-400 ml-1">{parseFloat(velocity).toFixed(1)} km/s</span>
                       <InfoTooltip 
                         termKey="velocity"
                         size="sm"
@@ -86,8 +89,8 @@ export default function AsteroidList() {
                   </div>
                 </div>
                 {isHazardous && (
-                  <div className="ml-2 px-2 py-1 rounded bg-red-500/20 border border-red-500/50">
-                    <AlertTriangle className="w-4 h-4 text-red-400" />
+                  <div className="ml-2 px-2 py-1 rounded bg-red-500/20 border border-red-500/50 flex-shrink-0">
+                    <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4 text-red-400" />
                   </div>
                 )}
               </div>

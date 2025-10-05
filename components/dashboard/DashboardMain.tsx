@@ -29,19 +29,19 @@ export default function DashboardMain() {
   };
 
   return (
-    <div className="container mx-auto px-4">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+        className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6"
       >
-        {/* Asteroid List - Left Column */}
-        <div className="lg:col-span-1">
+        {/* Asteroid List - Left Column / Top on mobile */}
+        <div className="lg:col-span-1 order-1 lg:order-1">
           <AsteroidList />
         </div>
 
-        {/* Main Content - Middle & Right Columns */}
-        <div className="lg:col-span-2 space-y-6"> 
+        {/* Main Content - Middle & Right Columns / Below on mobile */}
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6 order-2 lg:order-2"> 
           <ControlPanel />
           <ImpactResults />                   
           <ImpactMap />      
