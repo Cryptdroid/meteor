@@ -14,14 +14,12 @@ interface ARSceneProps {
   asteroids?: NASAAsteroid[];
   selectedAsteroid?: NASAAsteroid | null;
   onAsteroidSelect?: (asteroid: NASAAsteroid) => void;
-  showImpactSimulation?: boolean;
 }
 
 export default function ARScene({
   asteroids = [],
   selectedAsteroid = null,
   onAsteroidSelect,
-  showImpactSimulation = false,
 }: ARSceneProps) {
   const [isARSupported, setIsARSupported] = useState<boolean>(false);
   const [isChecking, setIsChecking] = useState<boolean>(true);
@@ -141,7 +139,6 @@ export default function ARScene({
               showGrid={showGrid}
               showLabels={showLabels}
               showOrbitPaths={showOrbitPaths}
-              showImpactSimulation={showImpactSimulation}
             />
 
             {/* Fallback camera controls for non-AR mode */}
@@ -152,7 +149,7 @@ export default function ARScene({
 
       {/* Instructions Overlay */}
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-lg text-sm z-40">
-        Point your camera at a flat surface to place asteroids
+        Point your camera at a flat surface to place solar system
       </div>
     </div>
   );

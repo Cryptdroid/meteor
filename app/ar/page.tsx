@@ -20,7 +20,7 @@ export default function ARPage() {
   const [selectedAsteroid, setSelectedAsteroid] = useState<NASAAsteroid | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showImpactSimulation, setShowImpactSimulation] = useState(false);
+
 
   useEffect(() => {
     loadAsteroids();
@@ -56,7 +56,6 @@ export default function ARPage() {
 
   const handleAsteroidSelect = (asteroid: NASAAsteroid) => {
     setSelectedAsteroid(asteroid);
-    setShowImpactSimulation(true);
   };
 
   if (loading) {
@@ -82,19 +81,7 @@ export default function ARPage() {
         <span>Back</span>
       </button>
 
-      {/* Impact Simulation Toggle */}
-      {selectedAsteroid && (
-        <button
-          onClick={() => setShowImpactSimulation(!showImpactSimulation)}
-          className={`absolute top-4 right-4 z-40 px-4 py-2 rounded-lg shadow-lg transition-all ${
-            showImpactSimulation
-              ? 'bg-red-600 hover:bg-red-700'
-              : 'bg-green-600 hover:bg-green-700'
-          } text-white`}
-        >
-          {showImpactSimulation ? '🔴 Hide Impact' : '🎯 Show Impact'}
-        </button>
-      )}
+
 
       {/* Error Message */}
       {error && (
@@ -108,17 +95,16 @@ export default function ARPage() {
         asteroids={asteroids}
         selectedAsteroid={selectedAsteroid}
         onAsteroidSelect={handleAsteroidSelect}
-        showImpactSimulation={showImpactSimulation}
       />
 
       {/* Info Footer */}
       <div className="absolute bottom-20 left-0 right-0 z-30 flex justify-center">
         <div className="bg-black/70 text-white px-6 py-3 rounded-lg text-sm max-w-md text-center">
           <p className="font-semibold text-cyan-400 mb-1">
-            {asteroids.length} Asteroids Loaded
+            {asteroids.length} Asteroid Orbits Loaded
           </p>
           <p className="text-xs text-gray-300">
-            Tap "Enter AR" to view in augmented reality
+            Tap "Enter AR" to view orbital mechanics in 3D space
           </p>
         </div>
       </div>
