@@ -7,7 +7,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
 
 try:
-    from routers import simulation, asteroids, deflection
+    from backend.routers import simulation, asteroids, deflection
 except ImportError:
     # Fallback imports if routers are not available
     simulation = asteroids = deflection = None
@@ -28,7 +28,8 @@ app.add_middleware(
         "http://localhost:3001",
         "https://*.vercel.app",
         "https://asteroid-defense-grid.vercel.app",
-        "https://asteroid-defense-grid-*.vercel.app"
+        "https://asteroid-defense-grid-*.vercel.app",
+        "https://silizi-956920432803.asia-south1.run.app"
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
