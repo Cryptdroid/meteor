@@ -150,17 +150,17 @@ static calculateSeismicEffects(params: ImpactParameters): {
 
     if (useBackend) {
       try {
-        const response = await fetch(`${backendUrl}/api/simulation/simulate`, {
+        const response = await fetch(`${backendUrl}/api/simulation`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            size: params.size,
+            diameter: params.size,
             density: params.density,
             velocity: params.velocity,
             angle: params.angle,
-            impact_location: {
+            target_location: {
               lat: params.impactLocation.lat,
               lng: params.impactLocation.lng,
             },

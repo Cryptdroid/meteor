@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from urllib.parse import urlparse, parse_qs
 
 NASA_API_BASE = "https://api.nasa.gov/neo/rest/v1"
-NASA_API_KEY = os.getenv("NASA_API_KEY", "DEMO_KEY")
+NASA_API_KEY = os.getenv("NASA_API_KEY", os.getenv("NEXT_PUBLIC_NASA_API_KEY", "DEMO_KEY"))
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
