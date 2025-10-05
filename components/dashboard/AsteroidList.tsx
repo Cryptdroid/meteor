@@ -23,7 +23,7 @@ export default function AsteroidList() {
   });
 
   return (
-    <Card variant="glass" className="h-[450px] flex flex-col">
+    <Card variant="glass" className="h-[560px] flex flex-col">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2">
           <AlertTriangle className="w-5 h-5 text-cyber-400" />
