@@ -218,13 +218,13 @@ static calculateSeismicEffects(params: ImpactParameters): {
       );
     }
 
-    // Calculate casualties using realistic population impact (like backend)
-    const damageRadiusKm = atmospheric.overpressure; // Use overpressure radius as damage zone
-    const populationAffected = Math.floor(damageRadiusKm * damageRadiusKm * Math.PI * 1000); // ~1000 people per km²
-    const casualties = {
-      estimated: Math.floor(populationAffected * 0.1), // 10% casualty rate in damage zone
-      affectedPopulation: populationAffected,
-    };
+    // Calculate casualties using realistic population impact with zone-based rates
+    const casualties = PopulationService.calculateCasualties(
+      populationData,
+      atmospheric.fireballRadius,
+      atmospheric.overpressure,
+      atmospheric.thermalRadiation
+    );
 
     return {
       energy,

@@ -84,6 +84,10 @@ class handler(BaseHTTPRequestHandler):
         # More realistic population impact (urban density ~1000 people/km²)
         population_affected = int(damage_radius_km**2 * math.pi * 1000) if damage_radius_km > 0 else 0
         
+        # Calculate realistic casualties (not 100% of affected population)
+        casualty_rate = 0.5  # 50% casualty rate in damage zone (consistent with backend)
+        estimated_casualties = int(population_affected * casualty_rate) if population_affected > 0 else 0
+        
         return {
             "input": {
                 "diameter": diameter,
@@ -99,7 +103,8 @@ class handler(BaseHTTPRequestHandler):
                 "energy_megatons": energy_megatons,
                 "crater_diameter_m": crater_diameter,
                 "damage_radius_km": damage_radius_km,
-                "estimated_casualties": population_affected,
+                "estimated_casualties": estimated_casualties,
+                "affected_population": population_affected,
                 "impact_classification": self.classify_impact(energy_megatons)
             },
             "warnings": [
