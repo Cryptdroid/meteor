@@ -215,7 +215,7 @@ export default function UnifiedSimulationView() {
                   </div>
                   
                   {/* Top Threat Cards - 3 columns */}
-                  <div className="lg:col-span-4">
+                  {/* <div className="lg:col-span-4">
                     <TopThreatCard 
                       asteroid={topThreats[0]} 
                       rank={1} 
@@ -232,18 +232,19 @@ export default function UnifiedSimulationView() {
                       asteroid={topThreats[2]} 
                       rank={3} 
                     />
-                  </div>
+                  </div> */}
                   
                   {/* Bottom Row with Control Panel and Overview */}
                   <div className="lg:col-span-4">
                     <AsteroidList />
                   </div>
+                  <div className="lg:col-span-8">
+                    <ImpactMap />
+                  </div>
                   <div className="lg:col-span-4">
                     <ControlPanel />
                   </div>
-                  <div className="lg:col-span-4">
-                    <ImpactMap />
-                  </div>
+                  
                 </div>
               ) : (
                 // Post-simulation: Impact Summary Dashboard

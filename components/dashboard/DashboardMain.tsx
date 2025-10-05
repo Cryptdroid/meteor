@@ -41,10 +41,10 @@ export default function DashboardMain() {
         </div>
 
         {/* Main Content - Middle & Right Columns */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-6"> 
           <ControlPanel />
-          <ImpactResults />
-          <ImpactMap />
+          <ImpactResults />                   
+          <ImpactMap />      
         </div>
       </motion.div>
     </div>
