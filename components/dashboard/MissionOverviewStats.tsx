@@ -184,7 +184,7 @@ export function MissionOverviewStats() {
           
           <div className="space-y-2">
             <LinearGauge
-              value={Math.min(100, 85 + (stats.totalAsteroids / 10))} // Detection based on tracked objects
+              value={Math.min(100, 85 + (stats.totalAsteroids / 10))} 
               max={100}
               label="Detection Network"
               unit="%"
