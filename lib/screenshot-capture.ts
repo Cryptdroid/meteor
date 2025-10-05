@@ -55,23 +55,8 @@ export class ScreenshotCapture {
         background: config.backgroundColor,
         useCORS: true,
         allowTaint: true,
-        logging: false,
-        // removeContainer: true, // Commented out as this property doesn't exist in Html2CanvasOptions
-        ignoreElements: (el: Element) => {
-          // Exclude elements with data-exclude-from-capture attribute
-          if (el.hasAttribute('data-exclude-from-capture')) {
-            return true;
-          }
-          
-          // Exclude specific CSS classes
-          if (config.excludeElements) {
-            return config.excludeElements.some(className => 
-              el.classList.contains(className)
-            );
-          }
-          
-          return false;
-        }
+        logging: false
+        // Note: Element filtering functionality removed as ignoreElements is not supported
       });
 
       // Convert to blob

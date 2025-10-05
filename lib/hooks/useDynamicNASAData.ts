@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { NASAService } from '@/lib/nasa-service';
 
@@ -10,7 +10,7 @@ export function useDynamicNASAData() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  const fetchAsteroids = async () => {
+  const fetchAsteroids = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -30,7 +30,7 @@ export function useDynamicNASAData() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [setAsteroidList]);
 
   useEffect(() => {
     // Initial fetch
@@ -40,7 +40,7 @@ export function useDynamicNASAData() {
     const interval = setInterval(fetchAsteroids, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchAsteroids]);
 
   return {
     isLoading,

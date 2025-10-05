@@ -471,7 +471,7 @@ function Earth({ position }: { position: Position3D }) {
     }
   });
 
-  const posArr = [position.x, position.z, position.y];
+  const posArr: [number, number, number] = [position.x, position.z, position.y];
 
   return (
     <group position={posArr} rotation={[0, 0, 23.5 / 360 * 2 * Math.PI]}>
@@ -612,11 +612,11 @@ function AnimationController({
   timeSpeed: number;
   isPlaying: boolean;
   currentTime: Date;
-  setCurrentTime: (time: Date) => void;
+  setCurrentTime: React.Dispatch<React.SetStateAction<Date>>;
 }) {
   useFrame((_, delta) => {
     if (isPlaying) {
-      setCurrentTime(prev => new Date(prev.getTime() + timeSpeed * delta * 86400000));
+      setCurrentTime((prev: Date) => new Date(prev.getTime() + timeSpeed * delta * 86400000));
     }
   });
 
