@@ -72,14 +72,16 @@ class handler(BaseHTTPRequestHandler):
         # TNT equivalent (1 ton TNT = 4.184 × 10^9 J)
         tnt_equivalent = kinetic_energy / (4.184e9)
         
-        # Crater diameter estimation (simplified)
+        # More realistic crater diameter estimation
         energy_megatons = tnt_equivalent / 1e6
-        crater_diameter = 1.8 * (energy_megatons ** 0.25) * 1000 if energy_megatons > 0 else 0
+        # Using Collins et al. crater scaling law: D ≈ 1.161 * (E^0.22) for land impacts
+        crater_diameter = 1.161 * (energy_megatons ** 0.22) if energy_megatons > 0 else 0
         
-        # Damage radius estimation
-        damage_radius_km = math.sqrt(energy_megatons) * 5 if energy_megatons > 0 else 0
+        # More realistic damage radius (based on overpressure zones)
+        # Severe damage radius roughly scales as energy^(1/3)
+        damage_radius_km = 0.28 * (energy_megatons ** (1/3)) if energy_megatons > 0 else 0
         
-        # Population impact (simplified)
+        # More realistic population impact (urban density ~1000 people/km²)
         population_affected = int(damage_radius_km**2 * math.pi * 1000) if damage_radius_km > 0 else 0
         
         return {
@@ -104,17 +106,27 @@ class handler(BaseHTTPRequestHandler):
                 "This is a simplified simulation for educational purposes",
                 "Real impact effects depend on many additional factors",
                 "Consult scientific literature for accurate assessments"
-            ]
+            ],
+            "reference_comparisons": {
+                "chelyabinsk_2013": "20m asteroid = ~0.5 megatons",
+                "tunguska_1908": "50m asteroid = ~10-15 megatons", 
+                "city_killer": "100m asteroid = ~100 megatons",
+                "chicxulub_extinction": "10km asteroid = ~100 million megatons"
+            }
         }
     
     def classify_impact(self, energy_megatons):
         """Classify impact severity based on energy"""
-        if energy_megatons < 1:
-            return "Local damage"
-        elif energy_megatons < 100:
-            return "Regional damage"
-        elif energy_megatons < 10000:
-            return "Continental damage"
+        if energy_megatons < 0.001:
+            return "Minimal damage"
+        elif energy_megatons < 0.1:
+            return "Local damage (building destruction)"
+        elif energy_megatons < 10:
+            return "City-wide damage"
+        elif energy_megatons < 1000:
+            return "Regional devastation"
+        elif energy_megatons < 100000:
+            return "Continental impact"
         elif energy_megatons < 100000000:
             return "Global climate effects"
         else:
