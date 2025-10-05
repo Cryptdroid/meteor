@@ -8,9 +8,11 @@ import * as THREE from 'three';
 import { NASAAsteroid } from '@/types';
 import ARAsteroidModel from './ARAsteroidModel';
 import AREarthModel from './AREarthModel';
+import WeaponSystem from './WeaponSystem';
+import XRController from './XRController';
 
 
-interface ARContentProps {
+interface SpaceContentProps {
   asteroids: NASAAsteroid[];
   selectedAsteroid: NASAAsteroid | null;
   onAsteroidSelect?: (asteroid: NASAAsteroid) => void;
@@ -18,7 +20,7 @@ interface ARContentProps {
   showGrid: boolean;
   showLabels: boolean;
   showOrbitPaths: boolean;
-  showImpactSimulation?: boolean; // Not used in orbital view
+  showImpactSimulation?: boolean; // Not used in space orbital view
 }
 
 // Simplified orbital path component
@@ -68,7 +70,7 @@ function OrbitPath({
   );
 }
 
-export default function ARContent({
+export default function SpaceContent({
   asteroids,
   selectedAsteroid,
   onAsteroidSelect,
@@ -76,272 +78,525 @@ export default function ARContent({
   showGrid,
   showLabels,
   showOrbitPaths,
-}: ARContentProps) {
+}: SpaceContentProps) {
   const xrState = useXR();
   const isPresenting = xrState.session !== null;
   const groupRef = useRef<THREE.Group>(null);
-  const [placementPosition, setPlacementPosition] = useState<THREE.Vector3>(
-    new THREE.Vector3(0, 0, -2)
-  );
-  const [isPlaced, setIsPlaced] = useState(false);
+  
+  // Space positioning - no placement needed, always visible
+  const spacePosition = new THREE.Vector3(0, 0, 0);
+  
+  // Game state
+  const [score, setScore] = useState(0);
+  const [meteorsDestroyed, setMeteorsDestroyed] = useState(0);
+  const [destroyedMeteors, setDestroyedMeteors] = useState<Set<string>>(new Set());
+  const [explosions, setExplosions] = useState<Array<{id: string, position: THREE.Vector3, time: number}>>([]);
+  const [gameLevel, setGameLevel] = useState(1);
+  const [health, setHealth] = useState(100);
+  const [accuracy, setAccuracy] = useState(100);
+  const [shotsFired, setShotsFired] = useState(0);
+  const [hits, setHits] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
 
-  // Handle hit testing for AR placement
-  useEffect(() => {
-    if (!isPresenting) return;
+  // Game reset function
+  const resetGame = () => {
+    setScore(0);
+    setMeteorsDestroyed(0);
+    setDestroyedMeteors(new Set());
+    setExplosions([]);
+    setGameLevel(1);
+    setHealth(100);
+    setAccuracy(100);
+    setShotsFired(0);
+    setHits(0);
+    setGameOver(false);
+  };
 
-    const session = (window as any).XRSession;
-    if (!session) return;
+  // Handle weapon fire with collision detection
+  const handleWeaponFire = (origin: THREE.Vector3, direction: THREE.Vector3) => {
+    setShotsFired(prev => prev + 1);
+    let hitDetected = false;
 
-    // Request hit test source
-    session.requestHitTestSource?.({ space: 'viewer' }).then((hitTestSource: any) => {
-      // Store hit test source for later use
-      (window as any).hitTestSource = hitTestSource;
-    });
+    // Check collision with meteors
+    const checkCollisions = () => {
+      meteorData.forEach(({ asteroid, distance, angle, elevation, size }) => {
+        if (destroyedMeteors.has(asteroid.id)) return;
 
-    return () => {
-      const source = (window as any).hitTestSource;
-      if (source) {
-        source.cancel();
-        (window as any).hitTestSource = null;
-      }
-    };
-  }, [isPresenting]);
-
-  // Auto-place content in AR
-  useFrame((state) => {
-    if (!isPresenting || isPlaced) return;
-
-    const hitTestSource = (window as any).hitTestSource;
-    const frame = (state as any).gl?.xr?.getFrame?.();
-
-    if (hitTestSource && frame) {
-      const referenceSpace = (state as any).gl?.xr?.getReferenceSpace?.();
-      if (referenceSpace) {
-        const hitTestResults = frame.getHitTestResults(hitTestSource);
-        if (hitTestResults.length > 0) {
-          const hit = hitTestResults[0];
-          const pose = hit.getPose(referenceSpace);
-          if (pose) {
-            const position = pose.transform.position;
-            setPlacementPosition(new THREE.Vector3(position.x, position.y, position.z));
-          }
+        // Calculate meteor position at current time
+        const time = Date.now() * 0.001;
+        const dynamicAngle = angle + time * 0.1;
+        
+        const meteorX = distance * Math.cos(dynamicAngle) * Math.cos(elevation);
+        const meteorY = distance * Math.sin(elevation) + Math.sin(time * 2) * 2;
+        const meteorZ = distance * Math.sin(dynamicAngle) * Math.cos(elevation);
+        
+        const meteorPosition = new THREE.Vector3(meteorX, meteorY, meteorZ);
+        
+        // Simple raycast collision detection
+        const bulletPath = new THREE.Ray(origin, direction);
+        const meteorSphere = new THREE.Sphere(meteorPosition, size);
+        
+        if (bulletPath.intersectsSphere(meteorSphere)) {
+          // Meteor hit!
+          hitDetected = true;
+          setHits(prev => prev + 1);
+          setDestroyedMeteors(prev => new Set(Array.from(prev).concat(asteroid.id)));
+          setMeteorsDestroyed(prev => prev + 1);
+          
+          const points = asteroid.is_potentially_hazardous_asteroid ? 100 : 50;
+          setScore(prev => prev + points * gameLevel);
+          
+          // Add explosion effect
+          const explosionId = Date.now().toString();
+          setExplosions(prev => [...prev, {
+            id: explosionId,
+            position: meteorPosition.clone(),
+            time: 0
+          }]);
+          
+          // Remove explosion after animation
+          setTimeout(() => {
+            setExplosions(prev => prev.filter(exp => exp.id !== explosionId));
+          }, 1000);
         }
-      }
+      });
+    };
+
+    // Check collisions immediately and over the bullet's travel path
+    checkCollisions();
+    setTimeout(checkCollisions, 50);
+    setTimeout(checkCollisions, 100);
+
+    // Update accuracy
+    setTimeout(() => {
+      setAccuracy(prev => shotsFired > 0 ? Math.round((hits / shotsFired) * 100) : 100);
+    }, 200);
+  };
+
+  // Handle XR controller trigger press
+  const handleXRTriggerPress = (controller: THREE.Object3D) => {
+    const origin = new THREE.Vector3();
+    const direction = new THREE.Vector3();
+    
+    controller.getWorldPosition(origin);
+    controller.getWorldDirection(direction);
+    
+    handleWeaponFire(origin, direction);
+  };
+
+  // Handle XR controller grip press (reload)
+  const handleXRGripPress = (controller: THREE.Object3D) => {
+    // Trigger reload action
+    console.log('XR Reload triggered');
+  };
+
+  // Space environment animation and explosion updates
+  useFrame((state, delta) => {
+    if (groupRef.current) {
+      // Gentle rotation for space effect
+      groupRef.current.rotation.y += 0.001;
+    }
+
+    // Update explosion animations
+    setExplosions(prev => 
+      prev.map(explosion => ({
+        ...explosion,
+        time: explosion.time + delta
+      }))
+    );
+
+    // Level progression based on meteors destroyed
+    const newLevel = Math.floor(meteorsDestroyed / 5) + 1;
+    if (newLevel > gameLevel) {
+      setGameLevel(newLevel);
+      setHealth(prev => Math.min(100, prev + 10)); // Bonus health on level up
+    }
+
+    // Reduce health over time (survival challenge)
+    if (meteorsDestroyed > 0 && !gameOver) {
+      setHealth(prev => {
+        const newHealth = Math.max(0, prev - delta * 0.5);
+        if (newHealth <= 0 && !gameOver) {
+          setGameOver(true);
+        }
+        return newHealth;
+      });
     }
   });
 
-  const handlePlacement = () => {
-    setIsPlaced(true);
-  };
-
-  // Generate orbital data for asteroids with realistic mechanics
-  const orbitalData = asteroids.slice(0, 3).map((asteroid, index) => {
-    // Use real orbital data if available, otherwise generate realistic values
-    const closeApproach = asteroid.close_approach_data[0];
-    const distance = closeApproach ? parseFloat(closeApproach.miss_distance.astronomical) : 0.1 + index * 0.05;
-    
-    return {
-      asteroid,
-      semiMajorAxis: distance * 0.3, // Scale for AR visibility
-      eccentricity: 0.1 + Math.random() * 0.3, // Realistic eccentricity
-      inclination: (Math.random() - 0.5) * 0.2, // Small inclination for visibility
-      currentPosition: distance * 0.5, // Current position on orbit
-      size: Math.max(0.02, Math.min(asteroid.estimated_diameter.kilometers.estimated_diameter_max * 0.02 * scale, 0.15)),
-    };
-  });
+  // Generate single target asteroid for shooting game
+  const singleAsteroid = asteroids.length > 0 ? asteroids[0] : null;
+  const meteorData = singleAsteroid ? [{
+    asteroid: singleAsteroid,
+    distance: 8, // Fixed distance in front of player
+    angle: 0, // Center position
+    elevation: 0, // At eye level
+    size: 0.5 * scale, // Large, visible size
+    speed: 0.05, // Slow, manageable movement
+    rotationSpeed: 0.01,
+    threat: singleAsteroid.is_potentially_hazardous_asteroid,
+  }] : [];
 
   return (
-    <group ref={groupRef} position={placementPosition.toArray()}>
-      {/* AR Grid for placement reference */}
-      {showGrid && !isPlaced && (
-        <Interactive onSelect={handlePlacement}>
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-            <planeGeometry args={[1.5, 1.5, 8, 8]} />
-            <meshBasicMaterial
-              color="#00ffff"
-              wireframe
-              transparent
-              opacity={0.3}
-            />
-          </mesh>
-        </Interactive>
+    <group ref={groupRef} position={spacePosition.toArray()}>
+      {/* Space Grid (optional reference) */}
+      {showGrid && (
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -5, 0]}>
+          <planeGeometry args={[20, 20, 20, 20]} />
+          <meshBasicMaterial
+            color="#444499"
+            wireframe
+            transparent
+            opacity={0.1}
+          />
+        </mesh>
       )}
 
-      {/* Only show orbital content after placement */}
-      {(isPlaced || !isPresenting) && (
-        <>
-          {/* Central Sun (scaled down, golden) */}
-          <mesh position={[0, 0, -1]}>
-            <sphereGeometry args={[0.05, 16, 16]} />
-            <meshBasicMaterial color="#ffaa00" />
+      {/* Space Content - Always visible */}
+          {/* Meteor Field Warning Light */}
+          <mesh position={[0, 8, 0]}>
+            <sphereGeometry args={[0.3, 16, 16]} />
+            <meshStandardMaterial 
+              color="#ff0000" 
+              emissive="#ff4444"
+              emissiveIntensity={0.5}
+            />
           </mesh>
           
-          {/* Sun label */}
+          {/* Warning Text */}
           {showLabels && (
             <Text
-              position={[0, 0.1, -1]}
-              fontSize={0.02}
-              color="#ffaa00"
+              position={[0, 9, 0]}
+              fontSize={0.5}
+              color="#ff4444"
               anchorX="center"
               anchorY="middle"
             >
-              Sun
+              ⚠️ METEOR FIELD DETECTED
             </Text>
           )}
 
-          {/* Earth's orbit (reference) */}
-          {showOrbitPaths && (
-            <OrbitPath
-              centerPosition={[0, 0, -1]}
-              semiMajorAxis={0.2}
-              eccentricity={0.017}
-              color="#4444ff"
-            />
-          )}
+          {/* Single Target Asteroid */}
+          {meteorData.map(({ asteroid, distance, angle, elevation, size, speed, rotationSpeed, threat }: any, index: number) => {
+            // Skip destroyed meteors
+            if (destroyedMeteors.has(asteroid.id)) return null;
 
-          {/* Earth */}
-          <AREarthModel
-            position={[0.2, 0, -1]}
-            scale={0.03 * scale}
-            showLabels={false}
-          />
-
-          {/* Earth label */}
-          {showLabels && (
-            <Text
-              position={[0.2, 0.05, -1]}
-              fontSize={0.015}
-              color="#4444ff"
-              anchorX="center"
-              anchorY="middle"
-            >
-              Earth
-            </Text>
-          )}
-
-          {/* Asteroid orbits and positions */}
-          {orbitalData.map(({ asteroid, semiMajorAxis, eccentricity, inclination, currentPosition, size }, index) => {
-            // Calculate current asteroid position on elliptical orbit
-            const theta = (Date.now() * 0.0001 + index * 2) % (Math.PI * 2); // Slow animation
-            const r = semiMajorAxis * (1 - eccentricity * eccentricity) / (1 + eccentricity * Math.cos(theta));
+            // Calculate simple floating motion for single asteroid
+            const time = Date.now() * 0.001;
             
-            const x = r * Math.cos(theta);
-            const y = r * Math.sin(theta) * Math.cos(inclination);
-            const z = r * Math.sin(theta) * Math.sin(inclination);
+            // Position directly in front of player with gentle movement
+            const x = Math.sin(time * 0.5) * 2; // Gentle side-to-side movement
+            const y = Math.cos(time * 0.3) * 1; // Gentle up-down movement
+            const z = -distance; // Fixed distance in front
             
-            const position: [number, number, number] = [x, z, -1 + y];
+            const position: [number, number, number] = [x, y, z];
             const isSelected = selectedAsteroid?.id === asteroid.id;
+            const isTargeted = isSelected;
 
             return (
               <group key={asteroid.id}>
-                {/* Orbital path */}
-                {showOrbitPaths && (
-                  <OrbitPath
-                    centerPosition={[0, 0, -1]}
-                    semiMajorAxis={semiMajorAxis}
-                    eccentricity={eccentricity}
-                    inclination={inclination}
-                    color={isSelected ? '#00ff00' : '#00aaff'}
-                  />
-                )}
-
-                {/* Asteroid */}
+                {/* Enhanced Meteor Target */}
                 <Interactive onSelect={() => onAsteroidSelect?.(asteroid)}>
-                  <mesh position={position}>
-                    <sphereGeometry args={[size, 8, 8]} />
-                    <meshPhongMaterial 
-                      color={isSelected ? '#00ff00' : asteroid.is_potentially_hazardous_asteroid ? '#ff4444' : '#888888'}
-                      emissive={isSelected ? '#004400' : asteroid.is_potentially_hazardous_asteroid ? '#440000' : '#000000'}
+                  <mesh 
+                    position={position}
+                    onClick={() => onAsteroidSelect?.(asteroid)}
+                    rotation={[time * rotationSpeed, time * rotationSpeed * 0.7, time * rotationSpeed * 0.3]}
+                  >
+                    <sphereGeometry args={[size, 20, 20]} />
+                    <meshStandardMaterial 
+                      color={isTargeted ? '#00ff00' : threat ? '#ff2222' : '#888888'}
+                      emissive={isTargeted ? '#004400' : threat ? '#660000' : '#000000'}
+                      emissiveIntensity={isTargeted ? 0.4 : threat ? 0.3 : 0.1}
+                      metalness={0.8}
+                      roughness={0.3}
                     />
                   </mesh>
                 </Interactive>
 
-                {/* Asteroid label */}
-                {showLabels && isSelected && (
+                {/* Meteor Danger Indicator */}
+                {threat && (
+                  <mesh position={[position[0], position[1] + size + 0.2, position[2]]}>
+                    <sphereGeometry args={[0.05, 8, 8]} />
+                    <meshBasicMaterial 
+                      color="#ff0000" 
+                      transparent
+                      opacity={0.8}
+                    />
+                  </mesh>
+                )}
+
+                {/* Meteor Target Label */}
+                {showLabels && isTargeted && (
                   <Text
-                    position={[position[0], position[1] + 0.05, position[2]]}
-                    fontSize={0.012}
-                    color={isSelected ? '#00ff00' : '#ffffff'}
+                    position={[position[0], position[1] + size + 0.3, position[2]]}
+                    fontSize={0.15}
+                    color={threat ? '#ff4444' : '#00ff88'}
                     anchorX="center"
                     anchorY="middle"
                   >
-                    {asteroid.name}
+                    {threat ? '🎯 HIGH VALUE TARGET' : '🎯 TARGET LOCKED'}
                   </Text>
                 )}
               </group>
             );
           })}
 
-          {/* Orbital mechanics info panel */}
+          {/* Enhanced Space Info Panel */}
           {showLabels && selectedAsteroid && (
             <Html
-              position={[0.5, 0.3, -1]}
+              position={[6, 2, -1]}
               center
               distanceFactor={1}
               style={{
-                background: 'rgba(0, 20, 40, 0.9)',
+                background: 'rgba(20, 10, 60, 0.95)',
                 color: 'white',
-                padding: '12px',
-                borderRadius: '8px',
-                fontSize: '11px',
-                maxWidth: '250px',
-                border: '1px solid #00aaff',
+                padding: '16px',
+                borderRadius: '12px',
+                fontSize: '12px',
+                maxWidth: '280px',
+                border: '2px solid #8844ff',
+                boxShadow: '0 0 20px rgba(136, 68, 255, 0.3)',
               }}
             >
               <div>
-                <h3 className="font-bold text-cyan-400 mb-2 text-sm">
-                  {selectedAsteroid.name}
+                <h3 className="font-bold text-purple-300 mb-3 text-base flex items-center gap-2">
+                  🌌 {selectedAsteroid.name}
                 </h3>
                 
-                <div className="space-y-1 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">Diameter:</span>
-                    <span>{selectedAsteroid.estimated_diameter.kilometers.estimated_diameter_max.toFixed(3)} km</span>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-purple-200">🔭 Diameter:</span>
+                    <span className="text-white font-mono">{selectedAsteroid.estimated_diameter.kilometers.estimated_diameter_max.toFixed(3)} km</span>
                   </div>
                   
                   {selectedAsteroid.close_approach_data[0] && (
                     <>
-                      <div className="flex justify-between">
-                        <span className="text-gray-300">Velocity:</span>
-                        <span>{parseFloat(selectedAsteroid.close_approach_data[0].relative_velocity.kilometers_per_second).toFixed(1)} km/s</span>
+                      <div className="flex justify-between items-center">
+                        <span className="text-purple-200">🚀 Velocity:</span>
+                        <span className="text-white font-mono">{parseFloat(selectedAsteroid.close_approach_data[0].relative_velocity.kilometers_per_second).toFixed(1)} km/s</span>
                       </div>
                       
-                      <div className="flex justify-between">
-                        <span className="text-gray-300">Distance:</span>
-                        <span>{parseFloat(selectedAsteroid.close_approach_data[0].miss_distance.astronomical).toFixed(4)} AU</span>
+                      <div className="flex justify-between items-center">
+                        <span className="text-purple-200">📏 Distance:</span>
+                        <span className="text-white font-mono">{parseFloat(selectedAsteroid.close_approach_data[0].miss_distance.astronomical).toFixed(4)} AU</span>
                       </div>
                     </>
                   )}
                   
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">Hazardous:</span>
-                    <span className={selectedAsteroid.is_potentially_hazardous_asteroid ? 'text-red-400' : 'text-green-400'}>
-                      {selectedAsteroid.is_potentially_hazardous_asteroid ? '⚠️ YES' : '✅ NO'}
+                  <div className="flex justify-between items-center">
+                    <span className="text-purple-200">⚠️ Threat Level:</span>
+                    <span className={selectedAsteroid.is_potentially_hazardous_asteroid ? 'text-red-400 font-bold' : 'text-green-400 font-bold'}>
+                      {selectedAsteroid.is_potentially_hazardous_asteroid ? '🔴 HIGH RISK' : '🟢 SAFE'}
                     </span>
                   </div>
                 </div>
                 
-                <div className="mt-2 pt-2 border-t border-gray-600 text-xs text-gray-400">
-                  AR Orbital Mechanics View
+                <div className="mt-3 pt-3 border-t border-purple-600 text-xs text-purple-300">
+                  🌌 Space XR Orbital Mechanics
                 </div>
               </div>
             </Html>
           )}
 
-          {/* Placement indicator */}
-          {!isPlaced && isPresenting && (
+          {/* Space Environment Status */}
+          {isPresenting && (
             <Text
-              position={[0, 0.3, 0]}
-              fontSize={0.04}
-              color="#00ffff"
+              position={[0, 8, 0]}
+              fontSize={0.5}
+              color="#8888ff"
               anchorX="center"
               anchorY="middle"
             >
-              Tap to place solar system
+              🌌 Space XR Mode Active
             </Text>
           )}
-        </>
-      )}
+
+          {/* Weapon System */}
+          <WeaponSystem 
+            onFire={handleWeaponFire}
+            isXRMode={isPresenting}
+          />
+
+          {/* XR Controllers */}
+          {isPresenting && (
+            <XRController 
+              onTriggerPress={handleXRTriggerPress}
+              onGripPress={handleXRGripPress}
+            />
+          )}
+
+          {/* Explosion Effects */}
+          {explosions.map(explosion => (
+            <group key={explosion.id}>
+              {/* Main explosion sphere */}
+              <mesh position={explosion.position}>
+                <sphereGeometry args={[0.5, 8, 8]} />
+                <meshBasicMaterial 
+                  color="#ff4400" 
+                  transparent 
+                  opacity={Math.max(0, 1 - explosion.time * 2)}
+                />
+              </mesh>
+              
+              {/* Outer explosion ring */}
+              <mesh position={explosion.position}>
+                <sphereGeometry args={[1.0, 8, 8]} />
+                <meshBasicMaterial 
+                  color="#ffaa00" 
+                  transparent 
+                  opacity={Math.max(0, 0.5 - explosion.time * 1.5)}
+                />
+              </mesh>
+              
+              {/* Particle sparks */}
+              {[...Array(8)].map((_, i) => (
+                <mesh 
+                  key={i}
+                  position={[
+                    explosion.position.x + Math.cos(i * Math.PI / 4) * explosion.time * 2,
+                    explosion.position.y + Math.sin(i * Math.PI / 4) * explosion.time * 2,
+                    explosion.position.z + (Math.random() - 0.5) * explosion.time * 2
+                  ]}
+                >
+                  <sphereGeometry args={[0.05, 4, 4]} />
+                  <meshBasicMaterial 
+                    color="#ffff00" 
+                    transparent 
+                    opacity={Math.max(0, 0.8 - explosion.time * 3)}
+                  />
+                </mesh>
+              ))}
+            </group>
+          ))}
+
+          {/* Game UI */}
+          {!gameOver ? (
+            <Html
+              position={[-8, 6, 0]}
+              center
+              distanceFactor={1}
+              style={{
+                background: 'rgba(0, 0, 0, 0.9)',
+                color: '#00ff00',
+                padding: '20px',
+                borderRadius: '12px',
+                fontSize: '14px',
+                fontFamily: 'monospace',
+                border: '2px solid #00ff00',
+                boxShadow: '0 0 20px rgba(0, 255, 0, 0.3)',
+                minWidth: '250px',
+              }}
+            >
+              <div>
+                <div style={{ 
+                  marginBottom: '12px', 
+                  textAlign: 'center',
+                  fontSize: '16px',
+                  color: '#ffff00'
+                }}>
+                  <strong>🎯 METEOR SHOOTER</strong>
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
+                  <div>Score: <span style={{ color: '#ffff00' }}>{score}</span></div>
+                  <div>Level: <span style={{ color: '#ff8800' }}>{gameLevel}</span></div>
+                  <div>Destroyed: <span style={{ color: '#ff4444' }}>{meteorsDestroyed}</span></div>
+                  <div>Accuracy: <span style={{ color: accuracy > 70 ? '#00ff00' : accuracy > 40 ? '#ffff00' : '#ff4444' }}>{accuracy}%</span></div>
+                </div>
+
+                {/* Health Bar */}
+                <div style={{ marginBottom: '12px' }}>
+                  <div style={{ fontSize: '12px', marginBottom: '4px' }}>Health:</div>
+                  <div style={{ 
+                    width: '100%', 
+                    height: '8px', 
+                    background: '#333333', 
+                    borderRadius: '4px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{ 
+                      width: `${health}%`, 
+                      height: '100%', 
+                      background: health > 60 ? '#00ff00' : health > 30 ? '#ffff00' : '#ff4444',
+                      transition: 'all 0.3s ease'
+                    }} />
+                  </div>
+                </div>
+
+                {/* Game Over Warning */}
+                {health <= 20 && (
+                  <div style={{ 
+                    color: '#ff0000', 
+                    fontSize: '12px', 
+                    textAlign: 'center',
+                    animation: 'blink 1s infinite'
+                  }}>
+                    ⚠️ CRITICAL HEALTH ⚠️
+                  </div>
+                )}
+
+                <div style={{ marginTop: '12px', fontSize: '11px', color: '#88ff88', textAlign: 'center' }}>
+                  🖱️ Click: Shoot | ⌨️ R: Reload<br/>
+                  🥽 XR: Trigger to Fire
+                </div>
+              </div>
+            </Html>
+          ) : (
+            /* Game Over Screen */
+            <Html
+              position={[0, 2, 0]}
+              center
+              distanceFactor={1}
+              style={{
+                background: 'rgba(0, 0, 0, 0.95)',
+                color: '#ff0000',
+                padding: '30px',
+                borderRadius: '20px',
+                fontSize: '18px',
+                fontFamily: 'monospace',
+                border: '3px solid #ff0000',
+                boxShadow: '0 0 30px rgba(255, 0, 0, 0.5)',
+                textAlign: 'center',
+                minWidth: '400px',
+              }}
+            >
+              <div>
+                <div style={{ 
+                  fontSize: '32px', 
+                  marginBottom: '20px',
+                  color: '#ff4444'
+                }}>
+                  💀 GAME OVER 💀
+                </div>
+                
+                <div style={{ marginBottom: '20px', color: '#ffffff' }}>
+                  <div style={{ marginBottom: '10px' }}>
+                    Final Score: <span style={{ color: '#ffff00', fontSize: '24px' }}>{score}</span>
+                  </div>
+                  <div>Level Reached: <span style={{ color: '#ff8800' }}>{gameLevel}</span></div>
+                  <div>Meteors Destroyed: <span style={{ color: '#ff4444' }}>{meteorsDestroyed}</span></div>
+                  <div>Final Accuracy: <span style={{ color: '#88ff88' }}>{accuracy}%</span></div>
+                </div>
+
+                <button
+                  onClick={resetGame}
+                  style={{
+                    background: '#00ff00',
+                    color: '#000000',
+                    border: 'none',
+                    padding: '12px 24px',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    fontFamily: 'monospace'
+                  }}
+                >
+                  🔄 PLAY AGAIN
+                </button>
+              </div>
+            </Html>
+          )}
     </group>
   );
 }

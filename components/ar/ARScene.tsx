@@ -3,107 +3,96 @@
 import { Suspense, useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { XR, XRButton, createXRStore } from '@react-three/xr';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, Stars } from '@react-three/drei';
 import * as THREE from 'three';
-import ARContent from './ARContent';
-import ARControls from './ARControls';
+import SpaceContent from './ARContent';
+import SpaceControls from './ARControls';
 import { NASAAsteroid } from '@/types';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Gamepad2 } from 'lucide-react';
 
-interface ARSceneProps {
+interface SpaceXRSceneProps {
   asteroids?: NASAAsteroid[];
   selectedAsteroid?: NASAAsteroid | null;
   onAsteroidSelect?: (asteroid: NASAAsteroid) => void;
 }
 
-export default function ARScene({
+export default function SpaceXRScene({
   asteroids = [],
   selectedAsteroid = null,
   onAsteroidSelect,
-}: ARSceneProps) {
-  const [isARSupported, setIsARSupported] = useState<boolean>(false);
+}: SpaceXRSceneProps) {
+  const [isXRSupported, setIsXRSupported] = useState<boolean>(false);
   const [isChecking, setIsChecking] = useState<boolean>(true);
-  const [arScale, setArScale] = useState<number>(1);
+  const [spaceScale, setSpaceScale] = useState<number>(1);
   const [showGrid, setShowGrid] = useState<boolean>(true);
   const [showLabels, setShowLabels] = useState<boolean>(true);
   const [showOrbitPaths, setShowOrbitPaths] = useState<boolean>(true);
+  const [controlMode, setControlMode] = useState<'mouse' | 'xr'>('mouse');
   
   // Create XR store
   const store = createXRStore();
 
   useEffect(() => {
     // Check if WebXR is supported
-    const checkARSupport = async () => {
+    const checkXRSupport = async () => {
       if ('xr' in navigator) {
         try {
           const isSupported = await (navigator as any).xr?.isSessionSupported('immersive-ar');
-          setIsARSupported(isSupported || false);
+          setIsXRSupported(isSupported || false);
         } catch (error) {
-          console.error('Error checking AR support:', error);
-          setIsARSupported(false);
+          console.error('Error checking XR support:', error);
+          setIsXRSupported(false);
         }
       } else {
-        setIsARSupported(false);
+        setIsXRSupported(false);
       }
       setIsChecking(false);
     };
 
-    checkARSupport();
+    checkXRSupport();
   }, []);
 
   if (isChecking) {
     return (
-      <div className="flex items-center justify-center h-screen bg-space-dark">
+      <div className="flex items-center justify-center h-screen bg-black">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
-          <p className="text-white">Checking AR Support...</p>
+          <p className="text-white">Initializing Space XR Environment...</p>
         </div>
       </div>
     );
   }
 
-  if (!isARSupported) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-space-dark p-6">
-        <div className="max-w-md bg-gray-900 border border-red-500 rounded-lg p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <AlertCircle className="w-6 h-6 text-red-500" />
-            <h2 className="text-xl font-bold text-white">AR Not Supported</h2>
-          </div>
-          <p className="text-gray-300 mb-4">
-            Your device does not support WebXR Augmented Reality. AR features require:
-          </p>
-          <ul className="list-disc list-inside text-gray-400 space-y-2 mb-4">
-            <li>A modern mobile browser (Chrome, Safari on iOS 15+)</li>
-            <li>ARCore support (Android) or ARKit support (iOS)</li>
-            <li>Camera permissions enabled</li>
-            <li>HTTPS connection (secure context)</li>
-          </ul>
-          <p className="text-sm text-gray-500">
-            Try accessing this page on a compatible mobile device or update your browser.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // Always allow access - fallback to mouse controls if XR not supported
+  const showXRFallbackMessage = !isXRSupported;
 
   return (
     <div className="relative w-full h-screen bg-black">
-      {/* AR Button - positioned at top */}
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
-        <XRButton
-          mode="immersive-ar"
-          store={store}
-          className="px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-bold rounded-lg shadow-lg transition-all"
-        >
-          Enter AR
-        </XRButton>
+      {/* Space XR Controls - Top Bar */}
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 flex gap-4 items-center">
+        {isXRSupported && (
+          <XRButton
+            mode="immersive-ar"
+            store={store}
+            className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg shadow-lg transition-all flex items-center gap-2"
+            onClick={() => setControlMode('xr')}
+          >
+            <Gamepad2 className="w-4 h-4" />
+            Enter Meteor Shooter XR
+          </XRButton>
+        )}
+        
+        {showXRFallbackMessage && (
+          <div className="px-4 py-2 bg-blue-900/80 text-cyan-200 text-sm rounded-lg border border-cyan-500/50">
+            Using Mouse & Keyboard Controls
+          </div>
+        )}
       </div>
 
-      {/* AR Controls Panel */}
-      <ARControls
-        scale={arScale}
-        onScaleChange={setArScale}
+      {/* Space Controls Panel */}
+      <SpaceControls
+        scale={spaceScale}
+        onScaleChange={setSpaceScale}
         showGrid={showGrid}
         onGridToggle={() => setShowGrid(!showGrid)}
         showLabels={showLabels}
@@ -113,11 +102,11 @@ export default function ARScene({
         selectedAsteroid={selectedAsteroid}
       />
 
-      {/* Main AR Canvas */}
+      {/* Main Space XR Canvas */}
       <Canvas
-        camera={{ position: [0, 1.6, 3], fov: 50 }}
+        camera={{ position: [0, 5, 10], fov: 60 }}
         gl={{
-          alpha: true,
+          alpha: false,
           antialias: true,
           powerPreference: 'high-performance',
         }}
@@ -125,31 +114,78 @@ export default function ARScene({
       >
         <XR store={store}>
           <Suspense fallback={null}>
-            {/* Lighting */}
-            <ambientLight intensity={0.6} />
-            <directionalLight position={[10, 10, 5]} intensity={1} castShadow />
-            <pointLight position={[-10, -10, -10]} intensity={0.5} />
+            {/* Space Background */}
+            <Stars
+              radius={300}
+              depth={60}
+              count={5000}
+              factor={7}
+              saturation={0}
+              fade
+              speed={0.5}
+            />
 
-            {/* AR Content */}
-            <ARContent
+            {/* Space Lighting */}
+            <ambientLight intensity={0.3} />
+            <directionalLight 
+              position={[50, 50, 25]} 
+              intensity={1.5} 
+              castShadow 
+              color="#ffffff"
+            />
+            <pointLight position={[0, 0, 0]} intensity={2} color="#ffaa00" />
+
+            {/* Space Content */}
+            <SpaceContent
               asteroids={asteroids}
               selectedAsteroid={selectedAsteroid}
               onAsteroidSelect={onAsteroidSelect}
-              scale={arScale}
+              scale={spaceScale}
               showGrid={showGrid}
               showLabels={showLabels}
               showOrbitPaths={showOrbitPaths}
             />
 
-            {/* Fallback camera controls for non-AR mode */}
-            <OrbitControls enableDamping dampingFactor={0.05} />
+            {/* Mouse & Keyboard Controls */}
+            <OrbitControls 
+              enableDamping 
+              dampingFactor={0.05}
+              enableZoom={true}
+              enablePan={true}
+              enableRotate={true}
+              minDistance={3}
+              maxDistance={50}
+              target={[0, 0, 0]}
+            />
           </Suspense>
         </XR>
       </Canvas>
 
-      {/* Instructions Overlay */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-lg text-sm z-40">
-        Point your camera at a flat surface to place solar system
+      {/* Crosshair */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
+        <div className="relative">
+          {/* Horizontal line */}
+          <div className="absolute w-8 h-0.5 bg-red-400 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80"></div>
+          {/* Vertical line */}
+          <div className="absolute w-0.5 h-8 bg-red-400 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-80"></div>
+          {/* Center dot */}
+          <div className="absolute w-1 h-1 bg-red-500 rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+          {/* Outer circle */}
+          <div className="absolute w-12 h-12 border border-red-400 rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-40"></div>
+        </div>
+      </div>
+
+      {/* Meteor Shooter Instructions */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-6 py-3 rounded-lg text-sm z-40 border border-red-500/50">
+        <div className="text-center">
+          <div className="text-red-400 font-semibold mb-1">🎯 METEOR SHOOTER</div>
+          <div className="flex gap-4 text-xs">
+            <span>🖱️ Click: Shoot</span>
+            <span>🔍 Drag: Aim</span>
+            <span>⌨️ R: Reload</span>
+            <span>🥽 XR: Trigger to Shoot</span>
+          </div>
+        </div>
       </div>
     </div>
   );
