@@ -1,22 +1,27 @@
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
-import sys
-import os
+from http.server import BaseHTTPRequestHandler
+import json
 
-# Add backend to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
-
-app = FastAPI()
-
-@app.get("/")
-async def health():
-    return JSONResponse({
-        "status": "healthy",
-        "service": "Asteroid Defense Grid API",
-        "version": "1.0.0",
-        "platform": "Vercel"
-    })
-
-# Vercel handler
-def handler(request):
-    return app(request)
+class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+        
+        response = {
+            "status": "healthy",
+            "service": "Asteroid Defense Grid API",
+            "version": "1.0.0",
+            "platform": "Vercel"
+        }
+        
+        self.wfile.write(json.dumps(response).encode())
+        return
+    
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
+        return

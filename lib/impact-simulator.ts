@@ -146,21 +146,31 @@ static calculateSeismicEffects(params: ImpactParameters): {
   static async simulate(params: ImpactParameters): Promise<ImpactResults> {
     // Check if backend usage is enabled
     const useBackend = process.env.NEXT_PUBLIC_USE_BACKEND === 'true';
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+
+    console.log('[DEBUG] Backend config:', {
+      useBackend,
+      backendUrl,
+      env_use_backend: process.env.NEXT_PUBLIC_USE_BACKEND,
+      env_backend_url: process.env.NEXT_PUBLIC_BACKEND_URL
+    });
 
     if (useBackend) {
       try {
-        const response = await fetch(`${backendUrl}/api/simulation/simulate`, {
+        // Use relative URL if no backend URL is specified (for Vercel serverless functions)
+        const apiUrl = backendUrl ? `${backendUrl}/api/simulation` : '/api/simulation';
+        console.log('[DEBUG] Calling backend URL:', apiUrl);
+        const response = await fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            size: params.size,
+            diameter: params.size,
             density: params.density,
             velocity: params.velocity,
             angle: params.angle,
-            impact_location: {
+            target_location: {
               lat: params.impactLocation.lat,
               lng: params.impactLocation.lng,
             },
@@ -170,7 +180,7 @@ static calculateSeismicEffects(params: ImpactParameters): {
 
         if (response.ok) {
           const data = await response.json();
-          console.log('[Backend] Using Python simulation results');
+          console.log('[Backend] Using Python simulation results:', data);
           
           // Transform backend response to match frontend types
           return {
@@ -202,7 +212,7 @@ static calculateSeismicEffects(params: ImpactParameters): {
           };
         }
       } catch (error) {
-        console.warn('[Backend] Failed to connect, falling back to frontend simulation:', error);
+        console.error('[Backend] Failed to connect, falling back to frontend simulation:', error);
       }
     }
 

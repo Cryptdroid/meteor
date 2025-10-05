@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Connection Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .loading { background-color: #fff3cd; color: #856404; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>API Connection Test - Production</h1>
+    <p>Testing connection to: <strong>https://meteor-dy4wl8l8f-sanishpaguis-projects.vercel.app/api</strong></p>
+    
+    <button onclick="testHealth()">Test Health Endpoint</button>
+    <button onclick="testAsteroids()">Test Asteroids Endpoint</button>
+    <button onclick="testSimulation()">Test Simulation Endpoint</button>
+    <button onclick="testSimulationWithData()">Test Simulation with Data</button>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'https://meteor-dy4wl8l8f-sanishpaguis-projects.vercel.app/api';
+        
+        function addResult(title, status, data) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${status}`;
+            div.innerHTML = `
+                <h3>${title}</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+            results.appendChild(div);
+        }
+        
+        async function testHealth() {
+            addResult('Health Check', 'loading', 'Testing...');
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                addResult('Health Check', response.ok ? 'success' : 'error', {
+                    status: response.status,
+                    data: data
+                });
+            } catch (error) {
+                addResult('Health Check', 'error', { error: error.message });
+            }
+        }
+        
+        async function testAsteroids() {
+            addResult('Asteroids API', 'loading', 'Testing...');
+            try {
+                const response = await fetch(`${API_BASE}/asteroids`);
+                const data = await response.json();
+                addResult('Asteroids API', response.ok ? 'success' : 'error', {
+                    status: response.status,
+                    data: data
+                });
+            } catch (error) {
+                addResult('Asteroids API', 'error', { error: error.message });
+            }
+        }
+        
+        async function testSimulation() {
+            addResult('Simulation API (GET)', 'loading', 'Testing...');
+            try {
+                const response = await fetch(`${API_BASE}/simulation`);
+                const data = await response.json();
+                addResult('Simulation API (GET)', response.ok ? 'success' : 'error', {
+                    status: response.status,
+                    data: data
+                });
+            } catch (error) {
+                addResult('Simulation API (GET)', 'error', { error: error.message });
+            }
+        }
+        
+        async function testSimulationWithData() {
+            addResult('Simulation POST', 'loading', 'Testing...');
+            try {
+                const testData = {
+                    diameter: 100,
+                    velocity: 20,
+                    angle: 45,
+                    density: 2600,
+                    target_location: { lat: 40.7128, lng: -74.0060 }
+                };
+                
+                const response = await fetch(`${API_BASE}/simulation`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const data = await response.json();
+                addResult('Simulation POST', response.ok ? 'success' : 'error', {
+                    status: response.status,
+                    input: testData,
+                    response: data
+                });
+            } catch (error) {
+                addResult('Simulation POST', 'error', { error: error.message });
+            }
+        }
+    </script>
+</body>
+</html>
