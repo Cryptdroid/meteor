@@ -17,12 +17,17 @@ export class ImpactSimulator {
     joules: number;
     megatonsTNT: number;
   } {
-    const radius = params.size / 2;
+    // More realistic energy calculation matching backend
+    const diameter = params.size;
+    const radius = diameter / 2;
     const volume = (4 / 3) * Math.PI * Math.pow(radius, 3);
     const mass = volume * params.density;
-    const velocityMS = params.velocity * 1000;
+    const velocityMS = params.velocity * 1000; // Convert km/s to m/s
     const energyJoules = 0.5 * mass * Math.pow(velocityMS, 2);
-    const megatonsTNT = energyJoules / (this.TNT_JOULES * 1000);
+    
+    // TNT equivalent (1 ton TNT = 4.184 × 10^9 J)
+    const tntEquivalentTons = energyJoules / (4.184e9);
+    const megatonsTNT = tntEquivalentTons / 1e6;
 
     return {
       joules: energyJoules,
@@ -31,9 +36,8 @@ export class ImpactSimulator {
   }
 
   /**
-   * Calculate crater dimensions using scaling laws
-   * Based on Collins et al. (2005) and Holsapple (1993)
-   * Formula: D = K * E^(1/3.4) where K is scaling constant
+   * Calculate crater dimensions using realistic scaling laws
+   * Using Collins et al. crater scaling law: D ≈ 1.161 * (E^0.22) for land impacts
    */
   static calculateCraterSize(params: ImpactParameters): {
     diameter: number;
@@ -42,11 +46,9 @@ export class ImpactSimulator {
     const energy = this.calculateImpactEnergy(params);
     const energyMT = energy.megatonsTNT;
 
-    // Scaling constant K (1.2 for land, 1.8 for water)
-    const K = params.isWaterImpact ? 1.8 : 1.2;
-    
-    // Scaling law: D = K * E^(1/3.4) in kilometers, convert to meters
-    const diameter = K * Math.pow(energyMT, 1 / 3.4) * 1000; // meters
+    // More realistic crater diameter estimation - matches backend
+    // Using Collins et al. crater scaling law: D ≈ 1.161 * (E^0.22) for land impacts
+    const diameter = energyMT > 0 ? 1.161 * Math.pow(energyMT, 0.22) * 1000 : 0; // meters
     
     // Depth-to-diameter ratio of 1:5 (typical for impact craters)
     const depth = diameter / 5; // meters
@@ -121,14 +123,15 @@ static calculateSeismicEffects(params: ImpactParameters): {
     const energy = this.calculateImpactEnergy(params);
     const energyMT = energy.megatonsTNT;
 
-    // Fireball radius (km)
+    // More realistic atmospheric effects - matching backend scaling
+    // Fireball radius (km) - reduced scaling
     const fireballRadius = Math.pow(energyMT, 0.4) * 0.28;
 
-    // Thermal radiation radius (3rd degree burns, km)
-    const thermalRadiation = Math.pow(energyMT, 0.41) * 2.2;
+    // Thermal radiation radius (3rd degree burns, km) - much more realistic
+    const thermalRadiation = Math.pow(energyMT, 0.33) * 1.2;
 
-    // Overpressure radius (5 psi, structural damage, km)
-    const overpressure = Math.pow(energyMT, 0.33) * 2.2;
+    // Overpressure radius (severe damage, km) - realistic scaling
+    const overpressure = 0.28 * Math.pow(energyMT, 1/3);
 
     return {
       fireballRadius,
@@ -138,83 +141,39 @@ static calculateSeismicEffects(params: ImpactParameters): {
   }
 
   /**
+   * Classify impact severity based on energy - matching backend classification
+   */
+  static classifyImpact(energyMegatons: number): string {
+    if (energyMegatons < 0.001) {
+      return "Minimal damage";
+    } else if (energyMegatons < 0.1) {
+      return "Local damage (building destruction)";
+    } else if (energyMegatons < 10) {
+      return "City-wide damage";
+    } else if (energyMegatons < 1000) {
+      return "Regional devastation";
+    } else if (energyMegatons < 100000) {
+      return "Continental impact";
+    } else if (energyMegatons < 100000000) {
+      return "Global climate effects";
+    } else {
+      return "Mass extinction event";
+    }
+  }
+
+  /**
    * Complete impact simulation
    */
   /**
    * Main simulation function with USGS terrain enhancement
    */
   static async simulate(params: ImpactParameters): Promise<ImpactResults> {
-    // Check if backend usage is enabled
-    const useBackend = process.env.NEXT_PUBLIC_USE_BACKEND === 'true';
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+    // DISABLED: Use only frontend simulation with realistic physics
+    const useBackend = false; // Forced to false - using frontend only
+    
+    console.log('[Frontend] Using realistic TypeScript simulation (backend disabled)');
 
-    console.log('[DEBUG] Backend config:', {
-      useBackend,
-      backendUrl,
-      env_use_backend: process.env.NEXT_PUBLIC_USE_BACKEND,
-      env_backend_url: process.env.NEXT_PUBLIC_BACKEND_URL
-    });
-
-    if (useBackend) {
-      try {
-        // Use relative URL if no backend URL is specified (for Vercel serverless functions)
-        const apiUrl = backendUrl ? `${backendUrl}/api/simulation` : '/api/simulation';
-        console.log('[DEBUG] Calling backend URL:', apiUrl);
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            diameter: params.size,
-            density: params.density,
-            velocity: params.velocity,
-            angle: params.angle,
-            target_location: {
-              lat: params.impactLocation.lat,
-              lng: params.impactLocation.lng,
-            },
-            is_water_impact: params.isWaterImpact || false,
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log('[Backend] Using Python simulation results:', data);
-          
-          // Transform backend response to match frontend types
-          return {
-            energy: {
-              joules: data.energy.joules,
-              megatonsTNT: data.energy.megatons_tnt,
-            },
-            crater: {
-              diameter: data.crater.diameter,
-              depth: data.crater.depth,
-            },
-            seismic: {
-              magnitude: data.seismic.magnitude,
-              radius: data.seismic.radius,
-            },
-            tsunami: data.tsunami ? {
-              waveHeight: data.tsunami.wave_height,
-              affectedRadius: data.tsunami.affected_radius,
-            } : undefined,
-            atmospheric: {
-              fireballRadius: data.atmospheric.fireball_radius,
-              thermalRadiation: data.atmospheric.thermal_radiation,
-              overpressure: data.atmospheric.overpressure,
-            },
-            casualties: data.casualties ? {
-              estimated: data.casualties.estimated,
-              affectedPopulation: data.casualties.affected_population,
-            } : undefined,
-          };
-        }
-      } catch (error) {
-        console.error('[Backend] Failed to connect, falling back to frontend simulation:', error);
-      }
-    }
+    // Backend disabled - using realistic frontend simulation only
 
     // Frontend simulation (original logic)
     console.log('[Frontend] Using TypeScript simulation');
@@ -259,13 +218,13 @@ static calculateSeismicEffects(params: ImpactParameters): {
       );
     }
 
-    // Calculate casualties using population data
-    const casualties = PopulationService.calculateCasualties(
-      populationData,
-      atmospheric.fireballRadius,
-      atmospheric.overpressure,
-      atmospheric.thermalRadiation
-    );
+    // Calculate casualties using realistic population impact (like backend)
+    const damageRadiusKm = atmospheric.overpressure; // Use overpressure radius as damage zone
+    const populationAffected = Math.floor(damageRadiusKm * damageRadiusKm * Math.PI * 1000); // ~1000 people per km²
+    const casualties = {
+      estimated: Math.floor(populationAffected * 0.1), // 10% casualty rate in damage zone
+      affectedPopulation: populationAffected,
+    };
 
     return {
       energy,
