@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '@/store/useAppStore';
 import { NASAService } from '@/lib/nasa-service';
+import { formatLargeNumber } from '@/lib/number-utils';
 import { 
   Satellite, 
   Target, 
@@ -109,66 +110,70 @@ export default function UnifiedSimulationView() {
         className="mb-3 sm:mb-4"
       >
         <Card variant="glass" className="p-3 sm:p-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
             {/* Status Information */}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3">
-                <div className={`w-4 h-4 rounded-full animate-pulse ${
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className={`w-4 h-4 flex-shrink-0 rounded-full animate-pulse ${
                   status.status === 'critical' ? 'bg-status-critical shadow-lg shadow-status-critical/50' :
                   status.status === 'warning' ? 'bg-status-warning shadow-lg shadow-status-warning/50' :
                   status.status === 'caution' ? 'bg-status-caution shadow-lg shadow-status-caution/50' :
                   'bg-status-normal shadow-lg shadow-status-normal/50'
                 }`} />
-                <span className={`font-bold font-mono tracking-wider ${status.color}`}>
+                <span className={`font-bold font-mono tracking-wider text-sm sm:text-base ${status.color} truncate`}>
                   {status.label}
                 </span>
               </div>
               
               {selectedAsteroid && (
-                <div className="text-stellar-light">
-                  <span className="text-stellar-light/60 text-sm">Target: </span>
-                  <span className="font-semibold">{selectedAsteroid.name}</span>
+                <div className="text-stellar-light min-w-0 flex-1 sm:flex-none">
+                  <span className="text-stellar-light/60 text-xs sm:text-sm">Target: </span>
+                  <span className="font-semibold text-sm sm:text-base truncate block sm:inline">
+                    {selectedAsteroid.name}
+                  </span>
                 </div>
               )}
             </div>
 
-            {/* View Mode Controls */}
-            <div className="flex flex-wrap gap-1 sm:gap-2">
-              <Button
-                variant={viewMode === 'overview' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('overview')}
-                className="gap-1 sm:gap-2 text-xs sm:text-sm"
-              >
-                <Globe className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">Overview</span>
-              </Button>
-              
-              <Button
-                variant={viewMode === '3d-focus' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('3d-focus')}
-                className="gap-1 sm:gap-2 text-xs sm:text-sm"
-              >
-                <Satellite className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">3D</span>
-              </Button>
-              
-              <Button
-                variant={viewMode === 'data-focus' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setViewMode('data-focus')}
-                className="gap-1 sm:gap-2 text-xs sm:text-sm"
-              >
-                <Activity className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">Data</span>
-              </Button>
+            {/* View Mode Controls - Mobile Optimized */}
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-1 w-full sm:w-auto">
+              <div className="flex gap-1 sm:gap-2 w-full sm:w-auto">
+                <Button
+                  variant={viewMode === 'overview' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('overview')}
+                  className="gap-1 sm:gap-2 text-xs sm:text-sm flex-1 sm:flex-none min-w-0"
+                >
+                  <Globe className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">Overview</span>
+                </Button>
+                
+                <Button
+                  variant={viewMode === '3d-focus' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('3d-focus')}
+                  className="gap-1 sm:gap-2 text-xs sm:text-sm flex-1 sm:flex-none min-w-0"
+                >
+                  <Satellite className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">3D View</span>
+                </Button>
+                
+                <Button
+                  variant={viewMode === 'data-focus' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('data-focus')}
+                  className="gap-1 sm:gap-2 text-xs sm:text-sm flex-1 sm:flex-none min-w-0"
+                >
+                  <Activity className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">Analytics</span>
+                </Button>
+              </div>
             </div>
           </div>
 
-          {/* Quick Stats */}
+          {/* Quick Stats - Mobile Optimized Grid */}
           {simulationResults && (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4 pt-4 border-t border-stellar-surface/20">
+            <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mt-4 pt-4 border-t border-stellar-surface/20">
               <CardMetric 
                 label="Impact Energy" 
                 value={`${simulationResults.energy.megatonsTNT.toFixed(1)}MT`}
@@ -185,7 +190,7 @@ export default function UnifiedSimulationView() {
               <CardMetric 
                 label="Affected Population" 
                 value={simulationResults.casualties?.affectedPopulation 
-                  ? (simulationResults.casualties.affectedPopulation / 1000000).toFixed(1) + 'M'
+                  ? formatLargeNumber(simulationResults.casualties.affectedPopulation)
                   : 'Unknown'
                 }
                 trend={simulationResults.casualties?.affectedPopulation && simulationResults.casualties.affectedPopulation > 1000000 ? 'up' : 'neutral'}
@@ -208,23 +213,30 @@ export default function UnifiedSimulationView() {
             <>
               {!simulationResults ? (
                 // Pre-simulation: Mission Control Dashboard Layout
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
-                  {/* Threat Radar - Full width on all screens */}
-                  <div className="lg:col-span-12">
+                <div className="space-y-4">
+                  {/* Top Section - Threat Radar (Full width) */}
+                  <div className="w-full">
                     <ThreatRadar />
                   </div>
                   
-                  {/* Mobile-first responsive layout */}
-                  <div className="lg:col-span-4 order-2 lg:order-1">
-                    <AsteroidList />
+                  {/* Main Section - Mobile Responsive 3 Column Layout */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4">
+                    <div className="md:col-span-2 lg:col-span-4">
+                      <div className="h-full">
+                        <AsteroidList />
+                      </div>
+                    </div>
+                    <div className="md:col-span-2 lg:col-span-5">
+                      <div className="h-full">
+                        <ImpactMap />
+                      </div>
+                    </div>
+                    <div className="md:col-span-2 lg:col-span-3">
+                      <div className="h-full">
+                        <ControlPanel />
+                      </div>
+                    </div>
                   </div>
-                  <div className="lg:col-span-8 order-1 lg:order-2">
-                    <ImpactMap />
-                  </div>
-                  <div className="lg:col-span-4 order-3">
-                    <ControlPanel />
-                  </div>
-                  
                 </div>
               ) : (
                 // Post-simulation: Impact Summary Dashboard
@@ -254,121 +266,115 @@ export default function UnifiedSimulationView() {
                   {/* Historical Comparison */}
                   <HistoricalComparison />
                   
-                  {/* Optional 3D View */}
-                  {showOrbitalView && (
-                    <Card variant="glass" className="h-[400px]">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="flex items-center gap-2">
-                            <Target className="w-5 h-5 text-cyber-400" />
-                            Orbital Mechanics
-                          </CardTitle>
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            onClick={() => setViewMode('3d-focus')}
-                          >
-                            <Maximize2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="h-[calc(100%-4rem)]">
-                        <div className="h-full">
-                          <RealisticOrbitalView embedded />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
                 </div>
               )}
             </>
           )}
 
           {viewMode === '3d-focus' && (
-            <div className="space-y-4">
-              <Card variant="glass" className="h-[calc(100vh-14rem)]">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <Satellite className="w-5 h-5 text-cyber-400" />
-                      3D Orbital Simulation
+            <div className="space-y-3 sm:space-y-4">
+              <Card variant="glass" className="h-[calc(100vh-12rem)] sm:h-[calc(100vh-14rem)]">
+                <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-6">
+                  <div className="flex items-center justify-between gap-2">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg min-w-0">
+                      <Satellite className="w-4 h-4 sm:w-5 sm:h-5 text-cyber-400 flex-shrink-0" />
+                      <span className="truncate">3D Orbital Simulation</span>
                     </CardTitle>
                     <Button
                       variant="ghost"
                       size="icon-sm"
                       onClick={() => setViewMode('overview')}
+                      className="flex-shrink-0"
                     >
                       <Minimize2 className="w-4 h-4" />
                     </Button>
                   </div>
                   {selectedAsteroid && (
-                    <p className="text-stellar-light/70">
+                    <p className="text-stellar-light/70 text-xs sm:text-sm truncate">
                       Analyzing trajectory for {selectedAsteroid.name}
                     </p>
                   )}
                 </CardHeader>
-                <CardContent className="h-[calc(100%-5rem)]">
+                <CardContent className="h-[calc(100%-4rem)] sm:h-[calc(100%-5rem)] px-3 sm:px-6">
                   <RealisticOrbitalView embedded />
                 </CardContent>
               </Card>
               
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <AsteroidList />
-                <ControlPanel />
-                <ImpactResults />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                <div className="md:col-span-2 lg:col-span-1">
+                  <AsteroidList />
+                </div>
+                <div className="md:col-span-1 lg:col-span-1">
+                  <ControlPanel />
+                </div>
+                <div className="md:col-span-1 lg:col-span-1">
+                  <ImpactResults />
+                </div>
               </div>
             </div>
           )}
 
           {viewMode === 'data-focus' && (
             // Data Focus: Scientific Analysis Lab Layout
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-              {/* Global Detection Network Status */}
-              <div className="lg:col-span-5">
-                <RealTimeDataPanel />
+            <div className="space-y-4">
+              {/* Top Row - Status and Database - Mobile Responsive */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+                <div className="h-full">
+                  <RealTimeDataPanel />
+                </div>
+                <div className="h-full">
+                  <Card variant="glass" className="p-3 sm:p-4 h-full">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center gap-2 text-cyber-400 text-base sm:text-lg">
+                        <Target className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <span className="truncate">Enhanced Asteroid Database</span>
+                      </CardTitle>
+                      <p className="text-xs sm:text-sm text-stellar-light/60">
+                        Detailed catalog with composition analysis and orbital parameters
+                      </p>
+                    </CardHeader>
+                    <CardContent>
+                      <AsteroidList />
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
               
-              {/* Asteroid Database & Composition */}
-              <div className="lg:col-span-7">
-                <Card variant="glass" className="p-4">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-cyber-400">
-                      <Target className="w-5 h-5" />
-                      Enhanced Asteroid Database
-                    </CardTitle>
-                    <p className="text-sm text-stellar-light/60">
-                      Detailed catalog with composition analysis and orbital parameters
-                    </p>
-                  </CardHeader>
-                  <CardContent>
-                    <AsteroidList />
-                  </CardContent>
-                </Card>
+              {/* Middle Row - Threat Radar and Impact Map - Mobile Responsive */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+                <div className="h-full">
+                  <ThreatRadar />
+                </div>
+                <div className="h-full">
+                  <ImpactMap />
+                </div>
               </div>
               
-              {/* Maps Section - Threat Radar and Impact Map */}
-              <div className="lg:col-span-6">
-                <ThreatRadar />
-              </div>
-              <div className="lg:col-span-6">
-                <ImpactMap />
-              </div>
-              
-              {/* Scientific Measurements & Analytics */}
-              <div className="lg:col-span-12">
+              {/* Bottom Row - Scientific Analytics */}
+              <div className="w-full">
                 <ScientificChartsPanel />
               </div>
               
-              {/* Orbit Calculations */}
-              <div className="lg:col-span-6">
-                <Card variant="glass" className="p-4">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-matrix-400">
-                      <Activity className="w-5 h-5" />
-                      Orbital Mechanics Calculator
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+              {/* Analysis Row - Orbital Mechanics and Impact Probability - Mobile Responsive */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+                <div className="h-full">
+                  <Card variant="glass" className="p-3 sm:p-4 h-full">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center gap-2 text-matrix-400">
+                        <Activity className="w-5 h-5" />
+                        Orbital Mechanics Calculator
+                        {selectedAsteroid && (
+                          <motion.div
+                            className="ml-2 px-2 py-1 rounded-full text-xs bg-matrix-500/20 text-matrix-400"
+                            animate={{ opacity: [0.5, 1, 0.5] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                          >
+                            LIVE
+                          </motion.div>
+                        )}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
                     {selectedAsteroid ? (
                       <div className="space-y-3">
                         <div className="p-3 rounded bg-cyber-500/10 border border-cyber-500/30">
@@ -461,20 +467,26 @@ export default function UnifiedSimulationView() {
                         <p className="text-sm">Select an asteroid to view orbital calculations</p>
                       </div>
                     )}
-                  </CardContent>
-                </Card>
-              </div>
-              
-              {/* Impact Probability Matrix */}
-              <div className="lg:col-span-6">
-                <Card variant="glass" className="p-4">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-status-warning">
-                      <AlertTriangle className="w-5 h-5" />
-                      Impact Probability Matrix
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                <div className="h-full">
+                  <Card variant="glass" className="p-3 sm:p-4 h-full">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center gap-2 text-status-warning">
+                        <AlertTriangle className="w-5 h-5" />
+                        Impact Probability Matrix
+                        <motion.div
+                          className="ml-2 px-2 py-1 rounded-full text-xs bg-status-warning/20 text-status-warning"
+                          animate={{ opacity: [0.5, 1, 0.5] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        >
+                          REALTIME
+                        </motion.div>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
                     <div className="space-y-3">
                       <div className="text-xs text-stellar-light/70 mb-3">
                         Collision probability assessment for tracked objects
@@ -487,18 +499,24 @@ export default function UnifiedSimulationView() {
                           const velocity = parseFloat(asteroid.close_approach_data[0]?.relative_velocity?.kilometers_per_second || '20');
                           const isPHA = asteroid.is_potentially_hazardous_asteroid;
                           
-                          // Enhanced probability calculation using multiple factors
+                          // Calculate approach date for dynamic timeline
+                          const approachDate = new Date(asteroid.close_approach_data[0]?.close_approach_date);
+                          const daysUntil = Math.ceil((approachDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                          
+                          // Enhanced dynamic probability calculation using multiple factors
                           const sizeFactor = Math.min(diameter / 1000, 1); // Normalize to 1km
                           const distanceFactor = Math.max(0.0001, 1 / (distance / 384400)); // Relative to Moon distance
                           const velocityFactor = velocity / 20; // Normalize to typical velocity
                           const phaMultiplier = isPHA ? 2.0 : 1.0;
                           
-                          const baseProbability = sizeFactor * distanceFactor * velocityFactor * phaMultiplier * 0.000001;
-                          const probability = Math.min(baseProbability, 0.1); // Cap at 10%
+                          // Time-based factor - closer approach dates have higher probability
+                          const timeFactor = Math.max(0.1, 1 / Math.max(Math.abs(daysUntil), 1));
                           
-                          // Calculate approach date for dynamic timeline
-                          const approachDate = new Date(asteroid.close_approach_data[0]?.close_approach_date);
-                          const daysUntil = Math.ceil((approachDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                          // Add some realistic random variation (simulate uncertainty)
+                          const uncertaintyFactor = 0.8 + (Math.sin(Date.now() / 10000 + index) * 0.2);
+                          
+                          const baseProbability = sizeFactor * distanceFactor * velocityFactor * phaMultiplier * timeFactor * uncertaintyFactor * 0.000001;
+                          const probability = Math.min(baseProbability, 0.1); // Cap at 10%
                           
                           return (
                             <motion.div
@@ -552,8 +570,9 @@ export default function UnifiedSimulationView() {
                         </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </div>
           )}

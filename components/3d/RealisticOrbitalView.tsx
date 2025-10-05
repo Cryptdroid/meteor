@@ -747,11 +747,6 @@ function OrbitalScene() {
             />
           ))}
           
-          <gridHelper 
-            args={[10, 20, "#333333", "#333333"]} 
-            rotation={[-Math.PI / 2, 0, 0]}
-          />
-          
           <OrbitControls 
             enablePan={true}
             enableZoom={true}
@@ -816,100 +811,11 @@ function OrbitalScene() {
               </span>
             </div>
             
-            <div className="flex items-center gap-2">
-              <Button
-                variant={showAllOrbits ? "default" : "outline"}
-                size="sm"
-                onClick={() => setShowAllOrbits(!showAllOrbits)}
-              >
-                <Activity className="w-4 h-4 mr-1" />
-                All Orbits
-              </Button>
-            </div>
           </div>
         </Card>
       </div>
       
-      {selectedAsteroid && selectedOrbitalElements && (
-        <div className="absolute top-4 right-4 w-80">
-          <Card variant="glass" className="p-4">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-cyber-400">
-                  <Target className="w-5 h-5" />
-                  {selectedAsteroid.name}
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-stellar-light/80 mb-2">Impact Zone Analysis</h3>
-                <div className="h-64 w-full rounded-lg overflow-hidden border border-matrix-600/30">
-                  <ImpactMap />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <span className="text-stellar-light/60 flex items-center">
-                    Semi-major axis:
-                    <InfoTooltip termKey="semi_major_axis" size="sm" />
-                  </span>
-                  <div className="font-mono text-matrix-400">
-                    {selectedOrbitalElements.semiMajorAxis.toFixed(3)} AU
-                  </div>
-                </div>
-                <div>
-                  <span className="text-stellar-light/60 flex items-center">
-                    Eccentricity:
-                    <InfoTooltip termKey="eccentricity" size="sm" />
-                  </span>
-                  <div className="font-mono text-cyber-400">
-                    {selectedOrbitalElements.eccentricity.toFixed(3)}
-                  </div>
-                </div>
-                <div>
-                  <span className="text-stellar-light/60 flex items-center">
-                    Inclination:
-                    <InfoTooltip termKey="inclination" size="sm" />
-                  </span>
-                  <div className="font-mono text-status-caution">
-                    {selectedOrbitalElements.inclination.toFixed(1)}°
-                  </div>
-                </div>
-                <div>
-                  <span className="text-stellar-light/60 flex items-center">
-                    Period:
-                    <InfoTooltip termKey="orbital_period" size="sm" />
-                  </span>
-                  <div className="font-mono text-status-normal">
-                    {selectedOrbitalElements.period.toFixed(0)} days
-                  </div>
-                </div>
-              </div>
-              
-              {asteroidPosition && (
-                <div className="pt-3 border-t border-stellar-surface/30">
-                  <div className="text-sm text-stellar-light/60 mb-2">Current Position (AU):</div>
-                  <div className="grid grid-cols-3 gap-2 text-xs font-mono">
-                    <div>
-                      <span className="text-stellar-light/60">X: </span>
-                      <span className="text-white">{asteroidPosition.x.toFixed(3)}</span>
-                    </div>
-                    <div>
-                      <span className="text-stellar-light/60">Y: </span>
-                      <span className="text-white">{asteroidPosition.y.toFixed(3)}</span>
-                    </div>
-                    <div>
-                      <span className="text-stellar-light/60">Z: </span>
-                      <span className="text-white">{asteroidPosition.z.toFixed(3)}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      )}
+
     </>
   );
 }

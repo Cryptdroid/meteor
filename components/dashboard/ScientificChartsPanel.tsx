@@ -1,12 +1,26 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, PieChart, TrendingUp, Activity } from 'lucide-react';
+import { BarChart3, PieChart, TrendingUp, Activity, RefreshCw } from 'lucide-react';
 
 export function ScientificChartsPanel() {
   const { asteroidList } = useAppStore();
+  const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  // Auto-refresh data every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLastUpdate(new Date());
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 1000);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Process data for charts
   const getSizeDistribution = () => {
@@ -54,12 +68,18 @@ export function ScientificChartsPanel() {
   return (
     <Card variant="glass" className="p-4">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-matrix-400">
-          <BarChart3 className="w-5 h-5" />
-          Scientific Analysis & Data Charts
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-matrix-400">
+            <BarChart3 className="w-5 h-5" />
+            Scientific Analysis & Data Charts
+          </CardTitle>
+          <div className="flex items-center gap-2 text-xs text-stellar-light/60">
+            <RefreshCw className={`w-3 h-3 ${isAnimating ? 'animate-spin' : ''}`} />
+            <span>Updated: {lastUpdate.toLocaleTimeString()}</span>
+          </div>
+        </div>
         <p className="text-sm text-stellar-light/60">
-          Statistical analysis of {asteroidList.length} near-Earth objects
+          Live statistical analysis of {asteroidList.length} near-Earth objects
         </p>
       </CardHeader>
       

@@ -8,6 +8,7 @@ import { ImpactStatistics } from './ImpactStatistics';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import { QuickShareButton } from '@/components/ui/SocialSharing';
 import InfoTooltip from '@/components/ui/InfoTooltip';
+import { formatLargeNumber } from '@/lib/number-utils';
 
 export default function ImpactResults() {
   const { simulationResults, selectedAsteroid, isSimulating, impactParameters } = useAppStore();
@@ -195,7 +196,7 @@ export default function ImpactResults() {
           
           <div className="text-center p-4 rounded bg-stellar-surface/20 border border-status-critical/20">
             <div className="text-status-critical text-2xl font-bold font-mono mb-1">
-              {casualties?.estimated ? (casualties.estimated / 1000000).toFixed(1) + 'M' : '0'}
+              {casualties?.estimated ? formatLargeNumber(casualties.estimated) : '0'}
             </div>
             <div className="text-sm text-stellar-light/80 font-medium">casualties</div>
             <div className="text-xs text-stellar-light/60 mt-1">Estimated Impact</div>

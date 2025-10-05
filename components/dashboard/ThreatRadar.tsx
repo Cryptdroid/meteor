@@ -1,13 +1,25 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Radar, AlertTriangle, Target } from 'lucide-react';
+import { Radar, AlertTriangle, Target, Zap } from 'lucide-react';
 import { QuickShareButton } from '@/components/ui/SocialSharing';
 
 export function ThreatRadar() {
   const { asteroidList } = useAppStore();
+  const [scanActive, setScanActive] = useState(true);
+  const [pulseKey, setPulseKey] = useState(0);
+
+  // Simulate radar scanning
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPulseKey(prev => prev + 1);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Calculate threat levels for asteroids
   const calculateThreatLevel = (asteroid: any) => {
@@ -47,8 +59,22 @@ export function ThreatRadar() {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-cyber-400">
-            <Radar className="w-5 h-5" />
+            <motion.div
+              key={pulseKey}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, ease: "linear" }}
+            >
+              <Radar className="w-5 h-5" />
+            </motion.div>
             Global Threat Radar
+            <div className="flex items-center gap-1 ml-2">
+              <motion.div
+                className="w-2 h-2 rounded-full bg-cyber-400"
+                animate={{ opacity: [0.3, 1, 0.3] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              />
+              <span className="text-xs text-cyber-400">SCANNING</span>
+            </div>
           </CardTitle>
           <QuickShareButton
             type="radar"
@@ -57,7 +83,7 @@ export function ThreatRadar() {
           />
         </div>
         <p className="text-sm text-stellar-light/60">
-          Real-time threat assessment of {asteroidList.length} tracked near-Earth objects
+          Live threat assessment of {asteroidList.length} tracked near-Earth objects
         </p>
       </CardHeader>
       <CardContent>

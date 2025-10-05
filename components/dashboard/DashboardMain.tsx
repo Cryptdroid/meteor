@@ -33,18 +33,26 @@ export default function DashboardMain() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6"
+        className="space-y-6"
       >
-        {/* Asteroid List - Left Column / Top on mobile */}
-        <div className="lg:col-span-1 order-1 lg:order-1">
-          <AsteroidList />
+        {/* Top Row - Control Panel */}
+        <div>
+          <ControlPanel />
         </div>
 
-        {/* Main Content - Middle & Right Columns / Below on mobile */}
-        <div className="lg:col-span-2 space-y-4 sm:space-y-6 order-2 lg:order-2"> 
-          <ControlPanel />
-          <ImpactResults />                   
-          <ImpactMap />      
+        {/* Main Row - 2 Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1">
+            <div className="h-full">
+              <AsteroidList />
+            </div>
+          </div>
+          <div className="lg:col-span-2">
+            <div className="space-y-6">
+              <ImpactResults />
+              <ImpactMap />
+            </div>
+          </div>
         </div>
       </motion.div>
     </div>

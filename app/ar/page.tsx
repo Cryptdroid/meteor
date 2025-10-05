@@ -8,8 +8,8 @@ import { NASAAsteroid } from '@/types';
 import { NASAService } from '@/lib/nasa-service';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 
-// Dynamic import to avoid SSR issues with WebXR
-const ARScene = dynamic(() => import('@/components/ar/ARScene'), {
+// Dynamic import to avoid SSR issues with WebXR - Orbital view only
+const AROrbitView = dynamic(() => import('../../components/ar/AROrbitView'), {
   ssr: false,
   loading: () => <LoadingScreen />,
 });
@@ -90,8 +90,8 @@ export default function ARPage() {
         </div>
       )}
 
-      {/* AR Scene */}
-      <ARScene
+      {/* AR Orbital View - No Game Elements */}
+      <AROrbitView
         asteroids={asteroids}
         selectedAsteroid={selectedAsteroid}
         onAsteroidSelect={handleAsteroidSelect}
@@ -104,7 +104,7 @@ export default function ARPage() {
             {asteroids.length} Asteroid Orbits Loaded
           </p>
           <p className="text-xs text-gray-300">
-            Tap "Enter AR" to view orbital mechanics in 3D space
+            Tap "Enter AR" to view orbital mechanics in augmented reality
           </p>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useAppStore } from '@/store/useAppStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CircularGauge, LinearGauge } from '@/components/ui/DataVisualization';
+import { formatCasualties } from '@/lib/number-utils';
 import { 
   Globe, 
   Shield, 
@@ -164,7 +165,7 @@ export function MissionOverviewStats() {
                   <div>
                     <div className="text-status-critical font-mono font-bold">
                       {simulationResults.casualties?.estimated ? 
-                        (simulationResults.casualties.estimated / 1000000).toFixed(1) + 'M' : '0'
+                        formatCasualties(simulationResults.casualties.estimated) : '0'
                       }
                     </div>
                     <div className="text-stellar-light/60">Casualties</div>

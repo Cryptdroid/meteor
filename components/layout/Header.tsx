@@ -127,7 +127,15 @@ export default function Header() {
                 <Link href="/ar">
                   <Button variant="outline" size="sm" className="gap-2">
                     <ScanEye className="w-4 h-4" />
-                    <span>AR Mode</span>
+                    <span>AR</span>
+                  </Button>
+                </Link>
+
+                {/* XR Game Mode */}
+                <Link href="/xr">
+                  <Button variant="outline" size="sm" className="gap-2 border-purple-500/50 text-purple-400 hover:bg-purple-500/10">
+                    <Target className="w-4 h-4" />
+                    <span>XR</span>
                   </Button>
                 </Link>
                 
@@ -227,7 +235,14 @@ export default function Header() {
               <Link href="/ar">
                 <Button variant="outline" className="w-full gap-2" onClick={() => setMobileMenuOpen(false)}>
                   <ScanEye className="w-4 h-4" />
-                  <span>AR Experience</span>
+                  <span>AR Orbital View</span>
+                </Button>
+              </Link>
+
+              <Link href="/xr">
+                <Button variant="outline" className="w-full gap-2 border-purple-500/50 text-purple-400 hover:bg-purple-500/10" onClick={() => setMobileMenuOpen(false)}>
+                  <Target className="w-4 h-4" />
+                  <span>XR Meteor Shooter</span>
                 </Button>
               </Link>
               
