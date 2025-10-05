@@ -43,41 +43,85 @@ class handler(BaseHTTPRequestHandler):
     
     def get_asteroids(self):
         """Get Near-Earth Objects from NASA API"""
-        # Get asteroids for the next 7 days
-        start_date = datetime.now().strftime("%Y-%m-%d")
-        end_date = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
-        
-        url = f"{NASA_API_BASE}/feed"
-        params = {
-            "start_date": start_date,
-            "end_date": end_date,
-            "api_key": NASA_API_KEY
-        }
-        
-        response = requests.get(url, params=params, timeout=30)
-        
-        if response.status_code == 200:
-            data = response.json()
+        try:
+            # Get asteroids for the next 7 days
+            start_date = datetime.now().strftime("%Y-%m-%d")
+            end_date = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
             
-            # Process and flatten the asteroid data
-            asteroids = []
-            for date_key, date_asteroids in data.get("near_earth_objects", {}).items():
-                asteroids.extend(date_asteroids)
+            url = f"{NASA_API_BASE}/feed"
+            params = {
+                "start_date": start_date,
+                "end_date": end_date,
+                "api_key": NASA_API_KEY
+            }
             
-            # Sort by size (largest first)
-            asteroids.sort(
-                key=lambda x: x.get("estimated_diameter", {}).get("kilometers", {}).get("estimated_diameter_max", 0),
-                reverse=True
-            )
+            # Debug info
+            debug_info = {
+                "url": url,
+                "api_key_set": bool(NASA_API_KEY and NASA_API_KEY != "DEMO_KEY"),
+                "params": {k: v if k != "api_key" else "***" for k, v in params.items()}
+            }
             
+            response = requests.get(url, params=params, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Process and flatten the asteroid data
+                asteroids = []
+                for date_key, date_asteroids in data.get("near_earth_objects", {}).items():
+                    asteroids.extend(date_asteroids)
+                
+                # Sort by size (largest first)
+                asteroids.sort(
+                    key=lambda x: x.get("estimated_diameter", {}).get("kilometers", {}).get("estimated_diameter_max", 0),
+                    reverse=True
+                )
+                
+                return {
+                    "count": len(asteroids),
+                    "asteroids": asteroids[:50],  # Limit to 50 for performance
+                    "source": "NASA NeoWs API",
+                    "debug": debug_info,
+                    "generated_at": datetime.now().isoformat()
+                }
+            else:
+                return {
+                    "error": f"NASA API error: {response.status_code}",
+                    "debug": debug_info,
+                    "response_text": response.text[:500]
+                }
+        except Exception as e:
+            # Fallback with sample data
             return {
-                "count": len(asteroids),
-                "asteroids": asteroids[:50],  # Limit to 50 for performance
-                "source": "NASA NeoWs API",
+                "count": 3,
+                "asteroids": [
+                    {
+                        "id": "sample_1",
+                        "name": "Sample Asteroid 1",
+                        "estimated_diameter": {
+                            "kilometers": {
+                                "estimated_diameter_min": 0.1,
+                                "estimated_diameter_max": 0.2
+                            }
+                        },
+                        "is_potentially_hazardous_asteroid": False,
+                        "close_approach_data": [
+                            {
+                                "relative_velocity": {"kilometers_per_second": "15.5"},
+                                "miss_distance": {"kilometers": "7500000"}
+                            }
+                        ]
+                    }
+                ],
+                "source": "Fallback data (NASA API unavailable)",
+                "error": f"NASA API Error: {str(e)}",
+                "debug": {
+                    "api_key_set": bool(NASA_API_KEY and NASA_API_KEY != "DEMO_KEY"),
+                    "nasa_api_base": NASA_API_BASE
+                },
                 "generated_at": datetime.now().isoformat()
             }
-        else:
-            raise Exception(f"NASA API error: {response.status_code}")
     
     def get_hazardous_asteroids(self):
         """Get only potentially hazardous asteroids"""
